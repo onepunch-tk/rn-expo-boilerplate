@@ -36,6 +36,15 @@
 					"resizeMode": "contain",
 					"backgroundColor": "#ffffff"
 				}
+			],
+			[
+				"expo-build-properties",
+				{
+					"ios": {
+						"ccacheEnabled": true,
+						"useFrameworks": "static"
+					}
+				}
 			]
 		],
 		"experiments": {

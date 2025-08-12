@@ -81,7 +81,7 @@ npm run ios:cc:stats
 npm run android:cc:stats
 ```
 
-더 자세한 정보는 [ccache 공식 문서](https://ccache.dev/)를 참고하세요.
+더 자세한 정보는 [ccache 공식 문서](https://ccache.dev/), [React Native 공식 문서](https://reactnative.dev/docs/build-speed)를 참고하세요.
 
 ## 📁 프로젝트 구조
 

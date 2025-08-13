@@ -1,7 +1,6 @@
 import { Redirect } from "expo-router";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { OnboardingScreen } from "@/components/OnboardingScreen";
-import { storage } from "@/helpers/storage";
 import { useOnboarding } from "@/hooks/useOnboarding";
 
 export default function Index() {

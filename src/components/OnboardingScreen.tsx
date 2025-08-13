@@ -24,8 +24,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ONBOARDING_KEY, ONBOARDING_PAGES } from "@/constants/onboarding";
-import { storage } from "@/helpers/storage";
-import { useOnboarding } from "@/hooks/useOnboarding";
+import { StorageHelper } from "@/helpers/storage";
 
 // ========================================================================================
 // Type Definitions
@@ -299,9 +298,9 @@ export function OnboardingScreen() {
 		translateX.value = 0; // 중요: 새 페이지에서 애니메이션 초기화
 	}
 
-	function handleDone() {
+	async function handleDone() {
 		router.replace("/");
-		storage.set(ONBOARDING_KEY, "true");
+		await StorageHelper.setItem(ONBOARDING_KEY, "true");
 	}
 
 	// ========================================================================================

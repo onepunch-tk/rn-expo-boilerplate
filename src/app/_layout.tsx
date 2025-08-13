@@ -3,6 +3,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { storage } from "@/helpers/storage";
 import "~/global.css";
 import { useMMKVDevTools } from "@dev-plugins/react-native-mmkv";
+import { AppProvider } from "@/context/AppContext";
 
 export default function RootLayout() {
 	if (__DEV__) {
@@ -11,7 +12,9 @@ export default function RootLayout() {
 	}
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
-			<Stack />
+			<AppProvider>
+				<Stack />
+			</AppProvider>
 		</GestureHandlerRootView>
 	);
 }

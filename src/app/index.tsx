@@ -14,8 +14,5 @@ export default function Index() {
 		return <OnboardingScreen />;
 	}
 
-	console.log("hasSeenOnboarding", storage.getAllKeys());
-
-	console.log("hasSeenOnboarding", hasSeenOnboarding);
 	return <Redirect href={"/(app)"} />;
 }

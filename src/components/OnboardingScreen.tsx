@@ -3,7 +3,7 @@
 // ========================================================================================
 
 import { Image } from "expo-image";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import { useState } from "react";
 import {
 	Button,
@@ -282,7 +282,6 @@ export function OnboardingScreen() {
 	const [currentPage, setCurrentPage] = useState(0); // 현재 활성 페이지 인덱스
 	const translateX = useSharedValue(0); // 스와이프 이동량 (UI 스레드 공유 값)
 	const insets = useSafeAreaInsets(); // 안전 영역 정보 (노치, 홈 버튼 등 고려)
-	const { setHasSeenOnboarding } = useOnboarding();
 
 	// ========================================================================================
 	// Helper Functions
@@ -301,7 +300,8 @@ export function OnboardingScreen() {
 	}
 
 	function handleDone() {
-		storage.set(ONBOARDING_KEY, true);
+		router.replace("/");
+		storage.set(ONBOARDING_KEY, "true");
 	}
 
 	// ========================================================================================

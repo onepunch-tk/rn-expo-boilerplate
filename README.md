@@ -1,9 +1,33 @@
 # React Native Expo 보일러플레이트
 
-React Native 앱을 빠르게 시작할 수 있는 보일러플레이트입니다. Expo 53 기반으로 제작되었으며, 온보딩, 로컬 스토리지, 애니메이션 등 핵심 기능들이 구현되어 있습니다.
+React Native 앱을 빠르게 시작할 수 있는 보일러플레이트입니다. Expo 53 기반으로 제작되었으며, 온보딩, 인증, 로컬 스토리지, 애니메이션 등 핵심 기능들이 구현되어 있습니다.
+
+## 🚀 필수 설정 (Required Setup)
+
+### 1. Supabase 프로젝트 설정
+
+1. [Supabase Console](https://supabase.com/dashboard)에서 새 프로젝트를 생성하세요
+2. 프로젝트 설정에서 API URL과 anon key를 확인하세요
+
+### 2. 환경 변수 설정
+
+프로젝트 루트에 `.env` 파일을 생성하고 다음 필드를 추가하세요:
+
+```bash
+# Supabase 설정
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_project_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### 3. Firebase 설정 (Crashlytics용)
+
+1. [Firebase Console](https://console.firebase.google.com/)에서 새 프로젝트 생성
+2. `google-services.json` (Android)와 `GoogleService-Info.plist` (iOS) 다운로드
+3. 이 파일들을 프로젝트 루트 디렉토리에 배치
 
 ## ✨ 주요 기능
 
+- 🔐 **인증 시스템**: Supabase Auth 기반 사용자 인증
 - 🎯 **인터랙티브 온보딩**: 스와이프 가능한 온보딩 화면
 - 💾 **로컬 스토리지**: MMKV 기반 고성능 키-값 스토리지
 - 🎨 **NativeWind**: Tailwind CSS 기반 스타일링
@@ -91,23 +115,29 @@ npm run android:cc:stats
 │   ├── app/                      # Expo Router 기반 앱 구조
 │   │   ├── _layout.tsx           # 루트 레이아웃 (GestureHandlerRootView 설정)
 │   │   ├── index.tsx             # 메인 엔트리 포인트
-│   │   └── (app)/                # 메인 앱 화면들
-│   │       ├── _layout.tsx       # 앱 레이아웃
-│   │       └── index.tsx         # 홈 화면
+│   │   ├── (app)/                # 메인 앱 화면들
+│   │   │   ├── _layout.tsx       # 앱 레이아웃
+│   │   │   └── index.tsx         # 홈 화면
+│   │   └── (auth)/               # 인증 관련 화면들
+│   │       ├── _layout.tsx       # 인증 레이아웃
+│   │       └── index.tsx         # 로그인/회원가입 화면
 │   ├── components/               # 재사용 가능한 컴포넌트
 │   │   ├── LoadingScreen.tsx     # 로딩 화면 컴포넌트
 │   │   └── OnboardingScreen.tsx  # 온보딩 화면 컴포넌트
 │   ├── constants/                # 상수 정의
 │   │   └── onboarding.ts         # 온보딩 관련 상수
 │   ├── context/                  # 리액트 컨텍스트
-│   │   └── AppContext.tsx        # 앱 전역 상태 관리
+│   │   ├── AppContext.tsx        # 앱 전역 상태 관리
+│   │   └── AuthContext.tsx       # 인증 상태 관리
 │   ├── helpers/                  # 유틸리티 함수들
 │   │   ├── crashlytics.ts        # Firebase Crashlytics 헬퍼
-│   │   └── storage.ts            # MMKV 스토리지 헬퍼
+│   │   ├── storage.ts            # MMKV 스토리지 헬퍼
+│   │   └── supabase.ts           # Supabase 클라이언트 설정
 │   ├── hooks/                    # 커스텀 React 훅
 │   │   └── useOnboarding.ts      # 온보딩 상태 관리 훅
 │   └── types/                    # 타입 정의
-│       └── app.ts                # 앱 관련 타입 정의
+│       ├── app.ts                # 앱 관련 타입 정의
+│       └── auth.ts               # 인증 관련 타입 정의
 ├── assets/                       # 정적 자산
 │   ├── fonts/                    # 폰트 파일들
 │   └── images/                   # 이미지 파일들
@@ -115,6 +145,8 @@ npm run android:cc:stats
 ├── scripts/                      # 빌드 스크립트
 │   ├── build-with-ccache.sh      # ccache 빌드 스크립트
 │   └── cache-utils.sh            # 캐시 유틸리티
+├── google-services.json          # Firebase Android 설정
+├── GoogleService-Info.plist      # Firebase iOS 설정
 
 ```
 
@@ -149,6 +181,54 @@ export const ONBOARDING_PAGES = [
 - **사용법**:
 ```typescript
 const { isLoading, hasSeenOnboarding } = useOnboarding();
+```
+
+### 🔐 인증 시스템 (Supabase Auth)
+
+#### AuthContext 컴포넌트
+- **위치**: `src/context/AuthContext.tsx`
+- **기능**: 
+  - Supabase 기반 사용자 인증 관리
+  - 로그인/로그아웃 상태 추적
+  - 자동 세션 복원
+  - Crashlytics 사용자 정보 연동
+- **설정**: `src/app/_layout.tsx`에서 `AuthProvider`로 앱 전체를 감싸야 함
+
+#### useAuth 훅 사용법
+```typescript
+import { useAuth } from "@/context/AuthContext";
+
+function MyComponent() {
+  const { authUser, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+  
+  return (
+    <View>
+      {authUser ? (
+        <Text>로그인됨: {authUser.email}</Text>
+      ) : (
+        <Text>로그인이 필요합니다</Text>
+      )}
+    </View>
+  );
+}
+```
+
+#### Supabase Auth Helper 사용법
+```typescript
+import { SupabaseAuthHelper } from "@/helpers/supabase";
+
+// 세션 상태 확인
+const { data: { session } } = await SupabaseAuthHelper.getSession();
+
+// 인증 상태 변화 감지
+SupabaseAuthHelper.onAuthStateChange((event, session) => {
+  console.log('Auth event:', event);
+  console.log('Session:', session?.user);
+});
 ```
 
 ### 🌙 앱 컨텍스트 시스템
@@ -256,32 +336,6 @@ await StorageHelper.setItem(COLOR_SCHEME_KEY, newScheme);
 ```
 
 ### 🚨 Firebase Crashlytics
-
-#### 필수 설정 (Required Setup)
-
-**1. Firebase 프로젝트 설정:**
-1. [Firebase Console](https://console.firebase.google.com/)에서 새 프로젝트 생성
-2. `google-services.json` (Android)와 `GoogleService-Info.plist` (iOS) 다운로드
-3. 이 파일들을 프로젝트 루트 디렉토리에 배치
-
-**2. app.json 설정:**
-`app.json`에서 다운로드한 파일 경로를 `googleServicesFile` 속성에 추가:
-```json
-{
-  "expo": {
-    "android": {
-      "googleServicesFile": "./google-services.json"
-    },
-    "ios": {
-      "googleServicesFile": "./GoogleService-Info.plist"
-    },
-    "plugins": [
-      "@react-native-firebase/app",
-      "@react-native-firebase/crashlytics"
-    ]
-  }
-}
-```
 
 #### Crashlytics Helper 사용법
 - **위치**: `src/helpers/crashlytics.ts`
@@ -410,13 +464,13 @@ CrashlyticsHelper.log("Payment process started");
 
 이 보일러플레이트는 지속적으로 발전하고 있습니다. 다음 기능들이 추가될 예정입니다:
 
-- 🔐 **인증 시스템**: Firebase Auth, 소셜 로그인
 - 🌍 **다국어 지원**: i18next 기반 국제화
 - 📱 **푸시 알림**: Firebase Cloud Messaging
 - 💰 **인앱 결제**: RevenueCat 연동
 - 🎯 **분석**: Firebase Analytics
 - 📋 **폼 관리**: React Hook Form
 - 🎭 **아이콘**: Expo Vector Icons
+- 🔒 **소셜 로그인**: Google, Apple, GitHub 등
 
 ## 🧰 사용된 주요 라이브러리
 
@@ -428,11 +482,13 @@ CrashlyticsHelper.log("Payment process started");
 - **MMKV**: 고성능 키-값 스토리지
 - **NativeWind 4**: Tailwind CSS for React Native
 - **TypeScript**: 타입 안전성
+- **Supabase**: 백엔드 서비스 (인증, 데이터베이스)
 - **Firebase**: Crashlytics, Analytics 등
 
 ## 📚 유용한 링크
 
 - [Expo 53 문서](https://docs.expo.dev/)
+- [Supabase 문서](https://supabase.com/docs)
 - [React Native 새 아키텍처](https://reactnative.dev/docs/the-new-architecture/landing-page)
 - [NativeWind 문서](https://www.nativewind.dev/)
 - [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)

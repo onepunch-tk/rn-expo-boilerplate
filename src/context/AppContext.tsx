@@ -6,6 +6,7 @@ import {
 	useEffect,
 	useState,
 } from "react";
+import { CrashlyticsHelper } from "@/helpers/crashlytics";
 import { StorageHelper } from "@/helpers/storage";
 import type { AppContextType, ColorSchemeType } from "@/types/app";
 
@@ -31,6 +32,10 @@ export function AppProvider({ children }: PropsWithChildren) {
 					console.error("Error initializing color scheme:", error);
 				}
 				// TODO: Firebase Crashlytics 추가 예정
+				CrashlyticsHelper.recordError(
+					error as Error,
+					"APP_COLOR_SCHEME_INIT_FAILED",
+				);
 			}
 		}
 		initColorScheme();
@@ -45,6 +50,10 @@ export function AppProvider({ children }: PropsWithChildren) {
 				console.error("Error setting color scheme:", error);
 			}
 			// TODO: Firebase Crashlytics 추가 예정
+			CrashlyticsHelper.recordError(
+				error as Error,
+				"APP_COLOR_SCHEME_UPDATE_FAILED",
+			);
 		}
 	}
 	return (

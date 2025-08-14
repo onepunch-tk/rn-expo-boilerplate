@@ -42,9 +42,9 @@ export const CrashlyticsHelper = {
 			console.error("Error Log crashlytics: ", error);
 		}
 	},
-	recordError(error: Error) {
+	recordError(error: Error, jsErrorName?: string) {
 		try {
-			crashlytics().recordError(error);
+			crashlytics().recordError(error, jsErrorName);
 		} catch (error) {
 			console.error("Error Record crashlytics error: ", error);
 		}

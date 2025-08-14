@@ -12,13 +12,6 @@ export default function RootLayout() {
 		// biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
 		useMMKVDevTools({ storage: storage });
 	}
-	// 앱 시작 시 Crashlytics 기본 초기화
-	useEffect(() => {
-		async function initCrashlytics() {
-			await CrashlyticsHelper.init();
-		}
-		initCrashlytics();
-	}, []);
 
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>

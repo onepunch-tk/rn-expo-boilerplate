@@ -13,6 +13,8 @@ React Native 앱을 빠르게 시작할 수 있는 보일러플레이트입니�
 - 🏗️ **New Architecture**: React Native 새 아키텍처 지원
 - ⚡ **ccache**: iOS 빌드 속도 최적화
 - 📱 **Safe Area**: 모든 기종 호환 UI
+- 🌙 **App Context**: 앱 전역 상태 관리 (컬러 스킴 등)
+- 🚨 **Firebase Crashlytics**: 실시간 에러 추적 및 분석
 
 ## 🚀 시작하기
 
@@ -98,10 +100,15 @@ npm run android:cc:stats
 │   │   └── OnboardingScreen.tsx  # 온보딩 화면 컴포넌트
 │   ├── constants/                # 상수 정의
 │   │   └── onboarding.ts         # 온보딩 관련 상수
+│   ├── context/                  # 리액트 컨텍스트
+│   │   └── AppContext.tsx        # 앱 전역 상태 관리
 │   ├── helpers/                  # 유틸리티 함수들
+│   │   ├── crashlytics.ts        # Firebase Crashlytics 헬퍼
 │   │   └── storage.ts            # MMKV 스토리지 헬퍼
-│   └── hooks/                    # 커스텀 React 훅
-│       └── useOnboarding.ts      # 온보딩 상태 관리 훅
+│   ├── hooks/                    # 커스텀 React 훅
+│   │   └── useOnboarding.ts      # 온보딩 상태 관리 훅
+│   └── types/                    # 타입 정의
+│       └── app.ts                # 앱 관련 타입 정의
 ├── assets/                       # 정적 자산
 │   ├── fonts/                    # 폰트 파일들
 │   └── images/                   # 이미지 파일들
@@ -145,28 +152,185 @@ export const ONBOARDING_PAGES = [
 const { isLoading, hasSeenOnboarding } = useOnboarding();
 ```
 
+### 🌙 앱 컨텍스트 시스템
+
+#### AppContext 컴포넌트
+- **위치**: `src/context/AppContext.tsx`
+- **기능**: 
+  - 앱 전역 상태 관리
+  - 컬러 스킴 설정 (다크/라이트 모드)
+  - 로컬 스토리지 연동
+  - 에러 핸들링
+- **설정**: `src/app/_layout.tsx`에서 `AppProvider`로 앱 전체를 감싸야 함
+
+#### useAppContext 훅 사용법
+```typescript
+import { useAppContext } from "@/context/AppContext";
+
+function MyComponent() {
+  const { colorScheme, setColorScheme } = useAppContext();
+  
+  return (
+    <View>
+      <Text>현재 테마: {colorScheme}</Text>
+      <Button 
+        title="다크 모드로 변경" 
+        onPress={() => setColorScheme("dark")} 
+      />
+    </View>
+  );
+}
+```
+
+#### AppContext 확장하기
+AppContext에 새로운 전역 상태를 추가할 수 있습니다:
+
+1. **타입 정의 추가** (`src/types/app.ts`):
+```typescript
+export interface AppContextType {
+  colorScheme: ColorSchemeType;
+  setColorScheme: (value: ColorSchemeType) => void;
+  // 새로운 필드 추가
+  foo:"bar"
+}
+```
+
+2. **AppProvider에서 상태 구현** (`src/context/AppContext.tsx`):
+```typescript
+export function AppProvider({ children }: PropsWithChildren) {
+  const [userColorScheme, setUserColorScheme] = useState<ColorSchemeType>("dark");
+  const [foo, setFoo] = useState<string>("bar");
+  
+  // ... existing code ...
+  
+  return (
+    <AppContext value={{ 
+      colorScheme: userColorScheme, 
+      setColorScheme,
+      foo,
+      setFoo
+    }}>
+      {children}
+    </AppContext>
+  );
+}
+```
+
 ### 💾 스토리지 시스템
 
-#### Storage Helper
+#### StorageHelper
 - **위치**: `src/helpers/storage.ts`
-- **기능**: MMKV 기반 로컬 스토리지
+- **기능**: MMKV 기반 로컬 스토리지 헬퍼
 - **사용법**:
 ```typescript
-import { storage } from "@/helpers/storage";
+import { StorageHelper } from "@/helpers/storage";
 
-// 데이터 저장
-storage.set("key", "value");
-storage.set("number", 123);
-storage.set("boolean", true);
+// 데이터 저장 (JSON 직렬화 자동 처리)
+await StorageHelper.setItem("user_preferences", {
+  theme: "dark",
+  language: "ko"
+});
+await StorageHelper.setItem("username", "john_doe");
+await StorageHelper.setItem("login_count", 5);
 
-// 데이터 읽기
-const value = storage.getString("key");
-const number = storage.getNumber("number");
-const boolean = storage.getBoolean("boolean");
+// 데이터 읽기 (JSON 파싱 자동 처리)
+const preferences = await StorageHelper.getItem("user_preferences");
+const username = await StorageHelper.getItem("username");
+const loginCount = await StorageHelper.getItem("login_count");
 
 // 데이터 삭제
-storage.delete("key");
+await StorageHelper.removeItem("username");
+
+// 전체 삭제
+await StorageHelper.clear();
 ```
+
+#### 실제 사용 예시 (AppContext에서):
+```typescript
+// AppContext.tsx에서 컬러 스킴 저장/로드
+const storedScheme = await StorageHelper.getItem(COLOR_SCHEME_KEY);
+if (storedScheme) {
+  setUserColorScheme(storedScheme as ColorSchemeType);
+}
+
+await StorageHelper.setItem(COLOR_SCHEME_KEY, newScheme);
+```
+
+### 🚨 Firebase Crashlytics
+
+#### 필수 설정 (Required Setup)
+
+**1. Firebase 프로젝트 설정:**
+1. [Firebase Console](https://console.firebase.google.com/)에서 새 프로젝트 생성
+2. `google-services.json` (Android)와 `GoogleService-Info.plist` (iOS) 다운로드
+3. 이 파일들을 프로젝트 루트 디렉토리에 배치
+
+**2. app.json 설정:**
+`app.json`에서 다운로드한 파일 경로를 `googleServicesFile` 속성에 추가:
+```json
+{
+  "expo": {
+    "android": {
+      "googleServicesFile": "./google-services.json"
+    },
+    "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist"
+    },
+    "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-firebase/crashlytics"
+    ]
+  }
+}
+```
+
+#### Crashlytics Helper 사용법
+- **위치**: `src/helpers/crashlytics.ts`
+- **기능**: 
+  - 자동 에러 추적
+  - 커스텀 에러 리포팅
+  - 사용자 속성 설정
+  - 로그 기록
+
+#### 기본 사용법:
+```typescript
+import { CrashlyticsHelper } from "@/helpers/crashlytics";
+
+// 에러 기록
+try {
+  // 위험한 작업
+} catch (error) {
+  CrashlyticsHelper.recordError(
+    error as Error,
+    "CUSTOM_ERROR_CODE"
+  );
+}
+
+// 사용자 정보 설정
+await CrashlyticsHelper.setUserId("user123");
+await CrashlyticsHelper.setAttributes({
+  email: "user@example.com",
+  plan: "premium"
+});
+
+// 커스텀 로그
+CrashlyticsHelper.log("User performed action X");
+```
+
+#### 앱 초기화에서 설정:
+`src/app/_layout.tsx`에서 자동으로 초기화됩니다:
+```typescript
+useEffect(() => {
+  async function initCrashlytics() {
+    await CrashlyticsHelper.init();
+  }
+  initCrashlytics();
+}, []);
+```
+
+#### 기술 문서:
+- [React Native Firebase 공식 문서](https://rnfirebase.io/)
+- [Firebase Crashlytics 가이드](https://firebase.google.com/docs/crashlytics)
 
 ### 🎨 스타일링
 
@@ -231,8 +395,6 @@ storage.delete("key");
 - 📱 **푸시 알림**: Firebase Cloud Messaging
 - 💰 **인앱 결제**: RevenueCat 연동
 - 🎯 **분석**: Firebase Analytics
-- 🚨 **에러 추적**: Crashlytics
-- 🌙 **테마 시스템**: 다크/라이트 모드
 - 🔄 **API 클라이언트**: Axios 기반 HTTP 클라이언트
 - 📋 **폼 관리**: React Hook Form
 - 🎭 **아이콘**: Expo Vector Icons
@@ -247,6 +409,7 @@ storage.delete("key");
 - **MMKV**: 고성능 키-값 스토리지
 - **NativeWind 4**: Tailwind CSS for React Native
 - **TypeScript**: 타입 안전성
+- **Firebase**: Crashlytics, Analytics 등
 
 ## 📚 유용한 링크
 
@@ -255,6 +418,7 @@ storage.delete("key");
 - [NativeWind 문서](https://www.nativewind.dev/)
 - [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)
 - [MMKV 문서](https://github.com/mrousavy/react-native-mmkv)
+- [React Native Firebase](https://rnfirebase.io/)
 
 ## 🤝 기여하기
 

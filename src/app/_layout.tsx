@@ -3,13 +3,23 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { storage } from "@/helpers/storage";
 import "~/global.css";
 import { useMMKVDevTools } from "@dev-plugins/react-native-mmkv";
+import { useEffect } from "react";
 import { AppProvider } from "@/context/AppContext";
+import { CrashlyticsHelper } from "@/helpers/crashlytics";
 
 export default function RootLayout() {
 	if (__DEV__) {
 		// biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
 		useMMKVDevTools({ storage: storage });
 	}
+	// 앱 시작 시 Crashlytics 기본 초기화
+	useEffect(() => {
+		async function initCrashlytics() {
+			await CrashlyticsHelper.init();
+		}
+		initCrashlytics();
+	}, []);
+
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<AppProvider>

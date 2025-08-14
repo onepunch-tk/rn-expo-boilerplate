@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "299384955425",
+    "project_id": "rn-expo-bolierplate",
+    "storage_bucket": "rn-expo-bolierplate.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:299384955425:android:80ae9396d1dbec3153b960",
+        "android_client_info": {
+          "package_name": "com.taekyung.rnexpoboilerplate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6qq4t6Izo0E4z--nTpp3iYIqPDv36dI8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyD6TjJ0WODgZvwuCDM_OhYeSJQF52DFa58</string>
+	<key>GCM_SENDER_ID</key>
+	<string>299384955425</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.taekyung.rnexpoboilerplate</string>
+	<key>PROJECT_ID</key>
+	<string>rn-expo-bolierplate</string>
+	<key>STORAGE_BUCKET</key>
+	<string>rn-expo-bolierplate.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:299384955425:ios:e01a3d08e2d4574f53b960</string>
+</dict>
+</plist>

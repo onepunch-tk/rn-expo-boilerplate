@@ -9,11 +9,13 @@
 		"userInterfaceStyle": "automatic",
 		"newArchEnabled": true,
 		"ios": {
+			"googleServicesFile": "./GoogleService-Info.plist",
 			"supportsTablet": true,
 			"bundleIdentifier": "com.taekyung.rnexpoboilerplate",
 			"appleTeamId": "63KCC5ADLW"
 		},
 		"android": {
+			"googleServicesFile": "./google-services.json",
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/images/adaptive-icon.png",
 				"backgroundColor": "#ffffff"
@@ -28,6 +30,8 @@
 		},
 		"plugins": [
 			"expo-router",
+			"@react-native-firebase/app",
+			"@react-native-firebase/crashlytics",
 			[
 				"expo-splash-screen",
 				{

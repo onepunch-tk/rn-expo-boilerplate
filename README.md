@@ -12,7 +12,6 @@ React Native 앱을 빠르게 시작할 수 있는 보일러플레이트입니�
 - 🎭 **Expo 53**: 최신 Expo SDK 지원
 - 🏗️ **New Architecture**: React Native 새 아키텍처 지원
 - ⚡ **ccache**: iOS 빌드 속도 최적화
-- 📱 **Safe Area**: 모든 기종 호환 UI
 - 🌙 **App Context**: 앱 전역 상태 관리 (컬러 스킴 등)
 - 🚨 **Firebase Crashlytics**: 실시간 에러 추적 및 분석
 
@@ -380,12 +379,10 @@ CrashlyticsHelper.log("User performed action X");
 이 보일러플레이트는 지속적으로 발전하고 있습니다. 다음 기능들이 추가될 예정입니다:
 
 - 🔐 **인증 시스템**: Firebase Auth, 소셜 로그인
-- 📊 **상태 관리**: Zustand 또는 Redux Toolkit
 - 🌍 **다국어 지원**: i18next 기반 국제화
 - 📱 **푸시 알림**: Firebase Cloud Messaging
 - 💰 **인앱 결제**: RevenueCat 연동
 - 🎯 **분석**: Firebase Analytics
-- 🔄 **API 클라이언트**: Axios 기반 HTTP 클라이언트
 - 📋 **폼 관리**: React Hook Form
 - 🎭 **아이콘**: Expo Vector Icons
 

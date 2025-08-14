@@ -1,4 +1,6 @@
+import type { User } from "@supabase/supabase-js";
+
 export interface AuthContextType {
-	isAuthenticated: boolean;
-	setIsAuthenticated: (value: boolean) => void;
+	isLoading: boolean;
+	authUser: User | null;
 }

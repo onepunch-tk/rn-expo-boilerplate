@@ -291,6 +291,35 @@ await StorageHelper.setItem(COLOR_SCHEME_KEY, newScheme);
   - 사용자 속성 설정
   - 로그 기록
 
+#### 초기화 (중요)
+**⚠️ 앱의 최상위 컴포넌트에서 반드시 `initialize()` 함수를 호출해야 합니다.**
+
+앱 시작 시 Crashlytics를 초기화하는 예시 (`src/app/_layout.tsx`):
+```typescript
+import { useEffect } from "react";
+import { CrashlyticsHelper } from "@/helpers/crashlytics";
+
+export default function RootLayout() {
+  // 앱 시작 시 Crashlytics 초기화
+  useEffect(() => {
+    async function initCrashlytics() {
+      try {
+        await CrashlyticsHelper.initialize();
+        console.log("Crashlytics 초기화 완료");
+      } catch (error) {
+        console.error("Crashlytics 초기화 실패:", error);
+      }
+    }
+    
+    initCrashlytics();
+  }, []);
+
+  return (
+    // ... your app layout
+  );
+}
+```
+
 #### 기본 사용법:
 ```typescript
 import { CrashlyticsHelper } from "@/helpers/crashlytics";
@@ -298,22 +327,25 @@ import { CrashlyticsHelper } from "@/helpers/crashlytics";
 // 에러 기록
 try {
   // 위험한 작업
+  const result = riskyOperation();
 } catch (error) {
   CrashlyticsHelper.recordError(
     error as Error,
-    "CUSTOM_ERROR_CODE"
+    "USER_ACTION_FAILED"
   );
 }
 
-// 사용자 정보 설정
+// 사용자 정보 설정 (로그인 시)
 await CrashlyticsHelper.setUserId("user123");
 await CrashlyticsHelper.setAttributes({
   email: "user@example.com",
-  plan: "premium"
+  plan: "premium",
+  version: "1.0.0"
 });
 
-// 커스텀 로그
-CrashlyticsHelper.log("User performed action X");
+// 커스텀 로그 (사용자 행동 추적)
+CrashlyticsHelper.log("User viewed product page");
+CrashlyticsHelper.log("Payment process started");
 ```
 
 #### 기술 문서:

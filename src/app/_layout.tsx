@@ -5,6 +5,7 @@ import "~/global.css";
 import { useMMKVDevTools } from "@dev-plugins/react-native-mmkv";
 import { useEffect } from "react";
 import { AppProvider } from "@/context/AppContext";
+import { AuthProvider } from "@/context/AuthContext";
 import { CrashlyticsHelper } from "@/helpers/crashlytics";
 
 export default function RootLayout() {
@@ -13,11 +14,26 @@ export default function RootLayout() {
 		useMMKVDevTools({ storage: storage });
 	}
 
+	// 앱 시작 시 Crashlytics 초기화
+	useEffect(() => {
+		async function initCrashlytics() {
+			try {
+				await CrashlyticsHelper.initialize();
+			} catch (error) {
+				console.error("Error initialize crashlytics: ", error);
+			}
+		}
+
+		initCrashlytics();
+	}, []);
+
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
-			<AppProvider>
-				<Stack />
-			</AppProvider>
+			<AuthProvider>
+				<AppProvider>
+					<Stack />
+				</AppProvider>
+			</AuthProvider>
 		</GestureHandlerRootView>
 	);
 }

@@ -1,6 +1,9 @@
 import crashlytics from "@react-native-firebase/crashlytics";
 
 export const CrashlyticsHelper = {
+	async initialize() {
+		await crashlytics().setCrashlyticsCollectionEnabled(true);
+	},
 	async setUserId(userId: string | null) {
 		try {
 			await crashlytics().setUserId(userId || "");

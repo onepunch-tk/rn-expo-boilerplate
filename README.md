@@ -317,20 +317,10 @@ await CrashlyticsHelper.setAttributes({
 CrashlyticsHelper.log("User performed action X");
 ```
 
-#### 앱 초기화에서 설정:
-`src/app/_layout.tsx`에서 자동으로 초기화됩니다:
-```typescript
-useEffect(() => {
-  async function initCrashlytics() {
-    await CrashlyticsHelper.init();
-  }
-  initCrashlytics();
-}, []);
-```
-
 #### 기술 문서:
 - [React Native Firebase 공식 문서](https://rnfirebase.io/)
 - [Firebase Crashlytics 가이드](https://firebase.google.com/docs/crashlytics)
+
 
 ### 🎨 스타일링
 

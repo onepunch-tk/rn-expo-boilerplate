@@ -13,8 +13,8 @@ const mmkvSupabaseSupportedStorage = {
 };
 
 const supabase = createClient(
-	ENV.EXPO_PUBLIC_SUPABASE_URL,
-	ENV.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+	process.env.EXPO_PUBLIC_SUPABASE_URL!,
+	process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
 	{
 		auth: {
 			storage: mmkvSupabaseSupportedStorage,

@@ -12,7 +12,20 @@
           "package_name": "com.taekyung.rnexpoboilerplate"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "299384955425-j3chhjcjtorf00dul3fvjt698ggtf70q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.taekyung.rnexpoboilerplate",
+            "certificate_hash": "8216ebfb196e9a5f01b764cc310df6995f80c39a"
+          }
+        },
+        {
+          "client_id": "299384955425-c3hk9321gfcc28cr8flq47nh8ccq3fc3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD6qq4t6Izo0E4z--nTpp3iYIqPDv36dI8"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "299384955425-c3hk9321gfcc28cr8flq47nh8ccq3fc3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "299384955425-ch9bcv0jjabt4vi4qm3srdv1dkhh4fju.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.taekyung.rnexpoboilerplate"
+              }
+            }
+          ]
         }
       }
     }

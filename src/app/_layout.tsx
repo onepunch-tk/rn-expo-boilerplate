@@ -1,16 +1,16 @@
-import { Stack } from "expo-router";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { storage } from "@/helpers/storage";
 import "~/global.css";
 import { useMMKVDevTools } from "@dev-plugins/react-native-mmkv";
+import { Stack } from "expo-router";
 import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { CrashlyticsHelper } from "@/helpers/crashlytics";
+import { storage } from "@/helpers/storage";
 
 export default function RootLayout() {
 	if (__DEV__) {
-		// biome-ignore lint/correctness/useHookAtTopLevel: <explanation>
+		// biome-ignore lint/correctness/useHookAtTopLevel: dev mode only
 		useMMKVDevTools({ storage: storage });
 	}
 

@@ -5,9 +5,6 @@ import {
 } from "@supabase/supabase-js";
 import { StorageHelper } from "./storage";
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
-
 const mmkvSupabaseSupportedStorage = {
 	getItem: async (key: string) => await StorageHelper.getItem(key),
 	setItem: async (key: string, value: string) =>
@@ -15,14 +12,18 @@ const mmkvSupabaseSupportedStorage = {
 	removeItem: async (key: string) => await StorageHelper.removeItem(key),
 };
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-	auth: {
-		storage: mmkvSupabaseSupportedStorage,
-		autoRefreshToken: true,
-		persistSession: true,
-		detectSessionInUrl: false,
+const supabase = createClient(
+	ENV.EXPO_PUBLIC_SUPABASE_URL,
+	ENV.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+	{
+		auth: {
+			storage: mmkvSupabaseSupportedStorage,
+			autoRefreshToken: true,
+			persistSession: true,
+			detectSessionInUrl: false,
+		},
 	},
-});
+);
 
 export const SupabaseAuthHelper = {
 	onAuthStateChange(

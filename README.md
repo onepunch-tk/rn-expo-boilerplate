@@ -17,13 +17,28 @@ React Native 앱을 빠르게 시작할 수 있는 보일러플레이트입니�
 # Supabase 설정
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_project_url
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Google OAuth (Google 로그인이 필요한 경우)
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your_google_web_client_id
 ```
 
 ### 3. Firebase 설정 (Crashlytics용)
 
 1. [Firebase Console](https://console.firebase.google.com/)에서 새 프로젝트 생성
-2. `google-services.json` (Android)와 `GoogleService-Info.plist` (iOS) 다운로드
-3. 이 파일들을 프로젝트 루트 디렉토리에 배치
+
+2. **Google OAuth 설정 (Google 로그인 기능이 필요한 경우)**
+   - Firebase Console에서 Authentication > Sign-in method로 이동
+   - Google 제공업체를 활성화
+   - Android 앱 설정에서 SHA-1 지문 등록:
+     ```bash
+     # Debug keystore SHA-1 확인 (개발용)
+     keytool -list -v -alias androiddebugkey -keystore ~/.android/debug.keystore
+     # 비밀번호: android
+     ```
+   - 출력에서 `SHA1:` 뒤의 지문을 복사하여 Firebase Console > 프로젝트 설정 > SHA 인증서 지문에 추가
+
+3. `google-services.json` (Android)와 `GoogleService-Info.plist` (iOS) 다운로드
+4. 이 파일들을 프로젝트 루트 디렉토리에 배치
 
 ## ✨ 주요 기능
 
@@ -218,6 +233,8 @@ function MyComponent() {
 ```
 
 #### Supabase Auth Helper 사용법
+
+##### 기본 세션 관리
 ```typescript
 import { SupabaseAuthHelper } from "@/helpers/supabase";
 
@@ -229,6 +246,52 @@ SupabaseAuthHelper.onAuthStateChange((event, session) => {
   console.log('Auth event:', event);
   console.log('Session:', session?.user);
 });
+```
+
+##### Google 로그인 사용법
+**⚠️ 중요**: Google 로그인을 사용하기 전에 반드시 `configureGoogleSignIn()`를 먼저 호출해야 합니다.
+
+```typescript
+import { SupabaseAuthHelper } from "@/helpers/supabase";
+import { useEffect } from "react";
+
+function LoginScreen() {
+  // 컴포넌트 마운트 시 Google Sign-In 설정
+  useEffect(() => {
+    SupabaseAuthHelper.configureGoogleSignIn();
+  }, []);
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const { success, error, data } = await SupabaseAuthHelper.signInWithGoogle();
+      
+      if (success) {
+        console.log('로그인 성공:', data.user?.email);
+        // 로그인 성공 후 처리
+      } else {
+        console.error('로그인 실패:', error.message);
+        // 에러 처리
+      }
+    } catch (error) {
+      console.error('로그인 에러:', error);
+    }
+  };
+
+  return (
+    <View>
+      <Button 
+        title="Google로 로그인" 
+        onPress={handleGoogleSignIn} 
+      />
+    </View>
+  );
+}
+```
+
+##### 로그아웃
+```typescript
+// 사용자 로그아웃
+await SupabaseAuthHelper.signOut();
 ```
 
 ### 🌙 앱 컨텍스트 시스템

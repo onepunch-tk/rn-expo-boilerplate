@@ -5,7 +5,8 @@
 		"KakaoSDKUser": "2.22.0"
 	},
 	"android": {
-		"v2All": "2.20.1",
-		"v2User": "2.20.1"
+		"v2Common": "2.20.0",
+		"v2Auth": "2.20.0",
+		"v2User": "2.20.0"
 	}
 }

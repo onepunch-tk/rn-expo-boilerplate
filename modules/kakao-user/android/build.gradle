@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 group = 'expo.modules.kakaouser'
-version = '0.7.2'
+version = '1.0.0'
 
 def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
 apply from: expoModulesCorePlugin
@@ -35,9 +35,53 @@ android {
   namespace "expo.modules.kakaouser"
   defaultConfig {
     versionCode 1
-    versionName "0.7.2"
+    versionName "1.0.0"
   }
   lintOptions {
     abortOnError false
   }
+}
+
+// kakaosdk-version.json에서 Kakao SDK 버전을 동적으로 읽어오기
+def getKakaoSdkVersion() {
+  def defaultVersion = "2.20.0"
+  try {
+    // Expo 프로젝트에서는 rootProject가 android/ 디렉토리를 가리킬 수 있음
+    def versionInfoFile = new File(rootProject.projectDir.parentFile, "modules/kakaosdk-version.json")
+    println "Debug: rootProject.projectDir: ${rootProject.projectDir}"
+    println "Debug: Looking for version file at: ${versionInfoFile.absolutePath}"
+    println "Debug: File exists: ${versionInfoFile.exists()}"
+    if (versionInfoFile.exists()) {
+      def versionInfo = new groovy.json.JsonSlurper().parseText(versionInfoFile.text)
+      def v2AuthVersion = versionInfo?.android?.v2Auth ?: defaultVersion
+      def v2UserVersion = versionInfo?.android?.v2User ?: defaultVersion
+      println "Info: Successfully loaded v2Auth Version: ${v2AuthVersion}"
+      println "Info: Successfully loaded v2User Version: ${v2UserVersion}"
+      
+      return [
+        v2Auth: v2AuthVersion,
+        v2User: v2UserVersion,
+      ]
+    } else {
+      println "Warning: kakaosdk-version.json not found. Using default version: ${defaultVersion}"
+      return [
+        v2Auth: defaultVersion,
+        v2User: defaultVersion,
+      ]
+    }
+  } catch (Exception e) {
+    println "Warning: Could not read kakaosdk-version.json (${e.message}). Using default version: ${defaultVersion}"
+    return [
+      v2Auth: defaultVersion,
+      v2User: defaultVersion,
+    ]
+  }
+}
+
+def kakaoVersions = getKakaoSdkVersion()
+
+dependencies {
+  implementation project(":kakao-core")
+  implementation "com.kakao.sdk:v2-auth:${kakaoVersions.v2Auth}"
+  implementation "com.kakao.sdk:v2-user:${kakaoVersions.v2User}"
 }

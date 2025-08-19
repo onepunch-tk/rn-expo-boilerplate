@@ -1,4 +1,4 @@
-import { type ConfigPlugin, withInfoPlist } from "@expo/config-plugins";
+import type { ConfigPlugin } from "@expo/config-plugins";
 import { withAndroid } from "./withAndroid";
 import { withIOS } from "./withIOS";
 

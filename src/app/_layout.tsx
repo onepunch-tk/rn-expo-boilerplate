@@ -7,6 +7,7 @@ import { AppProvider } from "@/context/AppContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { CrashlyticsHelper } from "@/helpers/crashlytics";
 import { storage } from "@/helpers/storage";
+import { SupabaseAuthHelper } from "@/helpers/supabase";
 
 export default function RootLayout() {
 	if (__DEV__) {
@@ -20,11 +21,17 @@ export default function RootLayout() {
 			try {
 				await CrashlyticsHelper.initialize();
 			} catch (error) {
-				console.error("Error initialize crashlytics: ", error);
+				if (__DEV__) {
+					console.error("Error initialize crashlytics: ", error);
+				}
 			}
 		}
-
 		initCrashlytics();
+	}, []);
+
+	useEffect(() => {
+		SupabaseAuthHelper.initializeKakaoSDK();
+		SupabaseAuthHelper.configureGoogleSignIn();
 	}, []);
 
 	return (

@@ -1,24 +1,29 @@
-import { useEffect } from "react";
-import { Button, Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { SupabaseAuthHelper } from "@/helpers/supabase";
 
 export default function Page() {
-	useEffect(() => {
-		SupabaseAuthHelper.configureGoogleSignIn();
-	}, []);
-
-	async function handleSignInWithGoogle() {
-		const { success, error, data } =
-			await SupabaseAuthHelper.signInWithGoogle();
-		if (success) {
-			console.log(data);
-		} else {
-			console.log(error);
-		}
+	async function handleLoginWithKakaoTalk() {
+		await SupabaseAuthHelper.signInWithKakao();
 	}
+
+	async function handleLoginWithGoogle() {
+		await SupabaseAuthHelper.signInWithGoogle();
+	}
+
 	return (
-		<View>
-			<Button title="Sign in with Google" onPress={handleSignInWithGoogle} />
+		<View className="flex-1 justify-center items-center">
+			<TouchableOpacity
+				className="bg-black p-4 rounded-md"
+				onPress={handleLoginWithKakaoTalk}
+			>
+				<Text className="text-white">SignIn With Kakao</Text>
+			</TouchableOpacity>
+			<TouchableOpacity
+				className="bg-black p-4 rounded-md"
+				onPress={handleLoginWithGoogle}
+			>
+				<Text className="text-white">SignIn With Google</Text>
+			</TouchableOpacity>
 		</View>
 	);
 }

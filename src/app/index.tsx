@@ -8,6 +8,8 @@ export default function Index() {
 	const { isLoading: isLoadingOnboarding, hasSeenOnboarding } = useOnboarding();
 	const { authUser, isLoading: isLoadingAuth } = useAuth();
 
+	console.log("authUser: ", authUser ? "true" : "false");
+
 	if (isLoadingAuth || isLoadingOnboarding) {
 		return <LoadingScreen />;
 	}

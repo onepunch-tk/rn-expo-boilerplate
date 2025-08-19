@@ -1,7 +1,5 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import { SupabaseAuthHelper } from "@/helpers/supabase";
-import KakaoCoreModule from "~/modules/kakao-core";
-import KakaoUserModule from "~/modules/kakao-user";
 
 export default function Page() {
 	async function handleLoginWithKakaoTalk() {

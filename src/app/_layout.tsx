@@ -29,6 +29,7 @@ export default function RootLayout() {
 		initCrashlytics();
 	}, []);
 
+	// 앱 시작 시 Kakao SDK 초기화 및 Google SignIn 설정
 	useEffect(() => {
 		SupabaseAuthHelper.initializeKakaoSDK();
 		SupabaseAuthHelper.configureGoogleSignIn();

@@ -20,6 +20,9 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 # Google OAuth (Google 로그인이 필요한 경우)
 EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your_google_web_client_id
+
+# Kakao OAuth (카카오 로그인이 필요한 경우)
+EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY=your_kakao_native_app_key
 ```
 
 ### 3. Firebase 설정 (Crashlytics용)
@@ -40,9 +43,138 @@ EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your_google_web_client_id
 3. `google-services.json` (Android)와 `GoogleService-Info.plist` (iOS) 다운로드
 4. 이 파일들을 프로젝트 루트 디렉토리에 배치
 
+### 4. 카카오 개발자 콘솔 설정
+
+**카카오 로그인 기능을 사용하려면 다음 단계를 따르세요:**
+
+1. [Kakao Developers](https://developers.kakao.com/console/app)에서 새 앱을 생성하세요
+   - **중요**: 개발 및 디버깅을 위해서는 **Test App**을 생성해야 합니다
+   - Test App을 생성해야만 `account_email` verification error가 발생하지 않습니다
+
+2. **앱 설정 > 플랫폼 설정**에서 iOS/Android 플랫폼 추가:
+   - **Android**: 패키지명과 키 해시 등록
+   - **iOS**: 번들 ID 등록
+
+3. **카카오 로그인 > 동의항목**에서 필수 항목 활성화:
+   - `account_email` (필수)
+   - `profile_nickname` (선택)
+   - `profile_image` (선택)
+
+4. **보안 > Client Secret** 생성 및 활성화
+
+5. 앱 키 확인:
+   - Native 앱 키 (SDK 초기화용)
+
+### 5. Supabase Authentication Provider 설정
+
+**Supabase에서 카카오 인증 설정:**
+
+1. [Supabase Dashboard](https://supabase.com/dashboard) > Authentication > Providers로 이동
+2. Kakao provider 활성화
+3. 카카오 개발자 콘솔에서 얻은 정보 입력:
+   - **Client ID**: Native 앱 키
+   - **Client Secret**: 보안 탭에서 생성한 Client Secret
+
+## 📱 카카오 로그인 사용법
+
+### Android 키 해시 확인
+Android 앱을 카카오 개발자 콘솔에 등록할 때 키 해시가 필요한 경우:
+
+```typescript
+import KakaoCoreModule from "~/modules/kakao-core";
+
+// 키 해시 확인
+const keyHash = await KakaoCoreModule.getKeyHash();
+console.log("Key Hash:", keyHash);
+```
+
+### 앱 설정 (app.json)
+
+**1. Kakao SDK 사용을 위한 필수 Android 설정:**
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraMavenRepos": [
+              "https://devrepo.kakao.com/nexus/content/groups/public/"
+            ]
+          }
+        }
+      ]
+    ]
+  }
+}
+```
+
+**2. Kakao Plugin 설정:**
+카카오 플러그인 설정에 대한 자세한 내용은 `plugins/kakao/` 디렉토리를 참조하세요.
+
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "./plugins/kakao",
+        {
+          "kakao": {
+            "nativeAppKey": "your_kakao_native_app_key",
+            "iosEnabled": true,
+            "androidEnabled": true
+          }
+        }
+      ]
+    ]
+  }
+}
+```
+
+### 초기화 및 사용법
+
+**1. SDK 초기화** (`src/app/_layout.tsx` 참조):
+```typescript
+import { SupabaseAuthHelper } from "@/helpers/supabase";
+import { useEffect } from "react";
+
+export default function RootLayout() {
+  useEffect(() => {
+    // 앱 시작 시 Kakao SDK 초기화
+    SupabaseAuthHelper.initializeKakaoSDK();
+  }, []);
+
+  return (
+    // ... your app layout
+  );
+}
+```
+
+**2. 로그인 구현** (`src/helpers/supabase.ts`, `src/app/(auth)/index.tsx` 참조):
+```typescript
+import { SupabaseAuthHelper } from "@/helpers/supabase";
+
+async function handleKakaoLogin() {
+  try {
+    const { success, error, data } = await SupabaseAuthHelper.signInWithKakao();
+    
+    if (success) {
+      console.log('카카오 로그인 성공:', data.user?.email);
+      // 로그인 성공 처리
+    } else {
+      console.error('카카오 로그인 실패:', error.message);
+      // 에러 처리
+    }
+  } catch (error) {
+    console.error('카카오 로그인 에러:', error);
+  }
+}
+```
+
 ## ✨ 주요 기능
 
-- 🔐 **인증 시스템**: Supabase Auth 기반 사용자 인증
+- 🔐 **인증 시스템**: Supabase Auth 기반 사용자 인증 (카카오, Google 지원)
 - 🎯 **인터랙티브 온보딩**: 스와이프 가능한 온보딩 화면
 - 💾 **로컬 스토리지**: MMKV 기반 고성능 키-값 스토리지
 - 🎨 **NativeWind**: Tailwind CSS 기반 스타일링
@@ -130,6 +262,7 @@ npm run android:cc:stats
 │   ├── app/                      # Expo Router 기반 앱 구조
 │   │   ├── _layout.tsx           # 루트 레이아웃 (GestureHandlerRootView 설정)
 │   │   ├── index.tsx             # 메인 엔트리 포인트
+│   │   ├── +not-found.tsx        # 404 페이지
 │   │   ├── (app)/                # 메인 앱 화면들
 │   │   │   ├── _layout.tsx       # 앱 레이아웃
 │   │   │   └── index.tsx         # 홈 화면
@@ -140,6 +273,7 @@ npm run android:cc:stats
 │   │   ├── LoadingScreen.tsx     # 로딩 화면 컴포넌트
 │   │   └── OnboardingScreen.tsx  # 온보딩 화면 컴포넌트
 │   ├── constants/                # 상수 정의
+│   │   ├── auth.ts               # 인증 관련 상수
 │   │   └── onboarding.ts         # 온보딩 관련 상수
 │   ├── context/                  # 리액트 컨텍스트
 │   │   ├── AppContext.tsx        # 앱 전역 상태 관리
@@ -147,22 +281,61 @@ npm run android:cc:stats
 │   ├── helpers/                  # 유틸리티 함수들
 │   │   ├── crashlytics.ts        # Firebase Crashlytics 헬퍼
 │   │   ├── storage.ts            # MMKV 스토리지 헬퍼
-│   │   └── supabase.ts           # Supabase 클라이언트 설정
+│   │   └── supabase.ts           # Supabase 클라이언트 설정 및 인증 헬퍼
 │   ├── hooks/                    # 커스텀 React 훅
 │   │   └── useOnboarding.ts      # 온보딩 상태 관리 훅
 │   └── types/                    # 타입 정의
 │       ├── app.ts                # 앱 관련 타입 정의
 │       └── auth.ts               # 인증 관련 타입 정의
+├── modules/                      # 네이티브 모듈 (Expo Modules API)
+│   ├── kakao-core/               # 카카오 SDK 코어 모듈
+│   │   ├── android/              # Android 네이티브 구현
+│   │   │   ├── build.gradle      # Gradle 빌드 설정
+│   │   │   └── src/main/java/    # Kotlin 소스 코드
+│   │   ├── ios/                  # iOS 네이티브 구현
+│   │   │   ├── KakaoCore.podspec # CocoaPods 설정
+│   │   │   └── *.swift           # Swift 소스 코드
+│   │   ├── src/                  # TypeScript 인터페이스
+│   │   ├── expo-module.config.json
+│   │   └── index.ts
+│   ├── kakao-user/               # 카카오 사용자 인증 모듈
+│   │   ├── android/              # Android 네이티브 구현
+│   │   ├── ios/                  # iOS 네이티브 구현
+│   │   ├── src/                  # TypeScript 인터페이스
+│   │   ├── expo-module.config.json
+│   │   └── index.ts
+│   └── kakaosdk-version.json     # 카카오 SDK 버전 관리
+├── plugins/                      # Expo Config Plugins
+│   ├── kakao/                    # 카카오 설정 플러그인
+│   │   ├── build/                # 빌드된 JavaScript 파일
+│   │   ├── src/                  # TypeScript 소스 코드
+│   │   ├── index.js              # 플러그인 진입점
+│   │   └── tsconfig.json
+│   ├── some/                     # 기타 플러그인 예시
+│   └── tsconfig.json             # 플러그인 전체 TypeScript 설정
 ├── assets/                       # 정적 자산
 │   ├── fonts/                    # 폰트 파일들
+│   │   └── SpaceMono-Regular.ttf
 │   └── images/                   # 이미지 파일들
-│       └── onboarding/           # 온보딩 이미지들
+│       ├── onboarding/           # 온보딩 이미지들
+│       ├── icon.png              # 앱 아이콘
+│       ├── splash-icon.png       # 스플래시 아이콘
+│       └── ...                   # 기타 이미지들
 ├── scripts/                      # 빌드 스크립트
 │   ├── build-with-ccache.sh      # ccache 빌드 스크립트
 │   └── cache-utils.sh            # 캐시 유틸리티
+├── android/                      # Android 프로젝트 (expo prebuild로 생성)
+├── ios/                          # iOS 프로젝트 (expo prebuild로 생성)
 ├── google-services.json          # Firebase Android 설정
 ├── GoogleService-Info.plist      # Firebase iOS 설정
-
+├── app.json                      # Expo 앱 설정
+├── package.json                  # npm 패키지 설정
+├── tsconfig.json                 # TypeScript 설정
+├── tailwind.config.js            # TailwindCSS 설정
+├── metro.config.js               # Metro 번들러 설정
+├── babel.config.js               # Babel 설정
+├── firebase.json                 # Firebase 설정
+└── global.css                    # 전역 CSS (NativeWind)
 ```
 
 ## 🔧 구성 요소 상세
@@ -282,6 +455,46 @@ function LoginScreen() {
       <Button 
         title="Google로 로그인" 
         onPress={handleGoogleSignIn} 
+      />
+    </View>
+  );
+}
+```
+
+##### 카카오 로그인 사용법
+**⚠️ 중요**: 카카오 로그인을 사용하기 전에 반드시 `initializeKakaoSDK()`를 먼저 호출해야 합니다.
+
+```typescript
+import { SupabaseAuthHelper } from "@/helpers/supabase";
+import { useEffect } from "react";
+
+function LoginScreen() {
+  // 컴포넌트 마운트 시 Kakao SDK 초기화
+  useEffect(() => {
+    SupabaseAuthHelper.initializeKakaoSDK();
+  }, []);
+
+  const handleKakaoSignIn = async () => {
+    try {
+      const { success, error, data } = await SupabaseAuthHelper.signInWithKakao();
+      
+      if (success) {
+        console.log('카카오 로그인 성공:', data.user?.email);
+        // 로그인 성공 후 처리
+      } else {
+        console.error('카카오 로그인 실패:', error.message);
+        // 에러 처리
+      }
+    } catch (error) {
+      console.error('카카오 로그인 에러:', error);
+    }
+  };
+
+  return (
+    <View>
+      <Button 
+        title="카카오로 로그인" 
+        onPress={handleKakaoSignIn} 
       />
     </View>
   );
@@ -694,6 +907,7 @@ npm run build:plugin
 
 - [Expo 53 문서](https://docs.expo.dev/)
 - [Supabase 문서](https://supabase.com/docs)
+- [Kakao Developers](https://developers.kakao.com/)
 - [React Native 새 아키텍처](https://reactnative.dev/docs/the-new-architecture/landing-page)
 - [NativeWind 문서](https://www.nativewind.dev/)
 - [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)

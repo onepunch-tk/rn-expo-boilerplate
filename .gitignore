@@ -43,8 +43,8 @@ ios
 android
 
 # native modules
-!modules/kakao-auth-module/**/*/
-modules/kakao-auth-module/android/build
+!modules/**/*/
+modules/**/*/android/build
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,webstorm+all,macos,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,webstorm+all,macos,windows

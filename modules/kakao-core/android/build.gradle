@@ -1,0 +1,77 @@
+apply plugin: 'com.android.library'
+
+group = 'expo.modules.kakaocore'
+version = '0.7.2'
+
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+apply from: expoModulesCorePlugin
+applyKotlinExpoModulesCorePlugin()
+useCoreDependencies()
+useExpoPublishing()
+
+// If you want to use the managed Android SDK versions from expo-modules-core, set this to true.
+// The Android SDK versions will be bumped from time to time in SDK releases and may introduce breaking changes in your module code.
+// Most of the time, you may like to manage the Android SDK versions yourself.
+def useManagedAndroidSdkVersions = false
+if (useManagedAndroidSdkVersions) {
+  useDefaultAndroidSdkVersions()
+} else {
+  buildscript {
+    // Simple helper that allows the root project to override versions declared by this library.
+    ext.safeExtGet = { prop, fallback ->
+      rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+    }
+  }
+  project.android {
+    compileSdkVersion safeExtGet("compileSdkVersion", 34)
+    defaultConfig {
+      minSdkVersion safeExtGet("minSdkVersion", 21)
+      targetSdkVersion safeExtGet("targetSdkVersion", 34)
+    }
+  }
+}
+
+android {
+  namespace "expo.modules.kakaocore"
+  defaultConfig {
+    versionCode 1
+    versionName "0.7.2"
+  }
+  lintOptions {
+    abortOnError false
+  }
+}
+
+// kakaosdk-version.json에서 Kakao SDK 버전을 동적으로 읽어오기
+def getKakaoSdkVersion() {
+  def defaultVersion = "2.20.1"
+  try {
+    def versionInfoFile = file("../../kakaosdk-version.json")
+    if (versionInfoFile.exists()) {
+      def versionInfo = new groovy.json.JsonSlurper().parseText(versionInfoFile.text)
+      def v2AllVersion = versionInfo?.android?.v2All ?: defaultVersion
+      println "Info: v2AllVersion: ${v2AllVersion}"
+      
+      return [
+        v2All: v2AllVersion,
+      ]
+    } else {
+      println "Warning: version-info.json not found. Using default version: ${defaultVersion}"
+      return [
+        v2All: defaultVersion,
+      ]
+    }
+  } catch (Exception e) {
+    println "Warning: Could not read version-info.json (${e.message}). Using default version: ${defaultVersion}"
+    return [
+      v2All: defaultVersion,
+    ]
+  }
+}
+
+def kakaoVersions = getKakaoSdkVersion()
+
+dependencies {
+  // Kakao SDK 의존성 추가 (kakaosdk-version.json에서 동적으로 버전 로드)
+  implementation "com.kakao.sdk:v2-all:${kakaoVersions.v2All}"
+}

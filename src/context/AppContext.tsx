@@ -22,7 +22,6 @@ export function AppProvider({ children }: PropsWithChildren) {
 		async function initColorScheme() {
 			try {
 				const storedScheme = await StorageHelper.getItem(COLOR_SCHEME_KEY);
-				console.log("storedScheme", storedScheme);
 				if (storedScheme) {
 					setUserColorScheme(storedScheme as ColorSchemeType);
 					colorScheme.set(storedScheme as ColorSchemeType);

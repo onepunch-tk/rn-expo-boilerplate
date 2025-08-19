@@ -47,6 +47,21 @@
 					"ios": {
 						"ccacheEnabled": true,
 						"useFrameworks": "static"
+					},
+					"android": {
+						"extraMavenRepos": [
+							"https://devrepo.kakao.com/nexus/content/groups/public/"
+						]
+					}
+				}
+			],
+			[
+				"./plugins/kakao",
+				{
+					"kakao": {
+						"nativeAppKey": "c6e6efd9ebc6ec24a3351df91474b324",
+						"iosEnabled": true,
+						"androidEnabled": true
 					}
 				}
 			]

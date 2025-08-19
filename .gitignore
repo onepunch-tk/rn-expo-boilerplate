@@ -42,6 +42,10 @@ app-example
 ios
 android
 
+# native modules
+!modules/kakao-auth-module/**/*/
+modules/kakao-auth-module/android/build
+
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,webstorm+all,macos,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,webstorm+all,macos,windows
 
@@ -86,6 +90,9 @@ Temporary Items
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 
+.vscode
+
+
 # Local History for Visual Studio Code
 .history/
 
@@ -102,6 +109,7 @@ Temporary Items
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
+.idea
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml

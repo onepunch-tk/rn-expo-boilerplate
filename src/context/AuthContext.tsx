@@ -30,9 +30,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
 			setIsLoading(false);
 		});
 
-		SupabaseAuthHelper.onAuthStateChange(async (_event, session) => {
+		// 인증 상태 변경 구독 (cleanup 추가!)
+		const {
+			data: { subscription },
+		} = SupabaseAuthHelper.onAuthStateChange(async (_event, session) => {
 			await handleAuthSession(session);
+			setIsLoading(false); // 로그인/로그아웃 시 로딩 해제
 		});
+
+		return () => {
+			subscription.unsubscribe();
+		};
 	}, []);
 
 	return (

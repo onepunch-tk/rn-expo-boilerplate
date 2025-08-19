@@ -486,6 +486,148 @@ CrashlyticsHelper.log("Payment process started");
 </View>
 ```
 
+## 🔌 Custom Plugin 개발
+
+### Plugin 구조 이해
+
+이 프로젝트는 `plugins/` 디렉토리에서 Expo Config Plugin을 직접 개발할 수 있도록 구성되어 있습니다.
+
+#### 현재 Plugin 구조
+```
+plugins/
+├── tsconfig.json              # TypeScript Project References 설정
+└── some/                     # 플러그인 예시
+    ├── index.js              # 플러그인 진입점
+    ├── tsconfig.json         # TypeScript 설정
+    ├── src/                  # TypeScript 소스 코드
+    │   └── index.ts          # 메인 플러그인 파일
+    └── build/                # 빌드된 JavaScript 파일들 (자동 생성)
+```
+
+### 새로운 Custom Plugin 생성하기
+
+#### 1. 플러그인 디렉토리 생성
+
+새로운 플러그인을 만들고 싶다면 `plugins/` 디렉토리에 플러그인명으로 새 디렉토리를 생성하세요:
+
+```bash
+mkdir plugins/my-custom-plugin
+```
+
+#### 2. 플러그인 디렉토리 구조 설정
+
+```
+plugins/my-custom-plugin/
+├── index.js                  # 플러그인 진입점 (필수)
+├── tsconfig.json            # TypeScript 설정 (필수)
+├── src/                     # TypeScript 소스 코드 디렉토리
+│   └── index.ts             # 메인 플러그인 파일 (필수)
+└── build/                   # 빌드 결과물 (자동 생성됨, 생성하지 마세요)
+```
+
+#### 3. 필수 파일 생성
+
+**`index.js` (플러그인 진입점)**:
+```javascript
+module.exports = require("./build");
+```
+
+**`tsconfig.json` (TypeScript 설정)**:
+```json
+{
+	"extends": "expo-module-scripts/tsconfig.plugin",
+	"compilerOptions": {
+		"outDir": "build",
+		"rootDir": "src"
+	},
+	"include": ["./src"],
+	"exclude": ["**/__mocks__/*", "**/__tests__/*"]
+}
+```
+
+**`src/index.ts` (메인 플러그인 파일)**:
+```typescript
+import type { ConfigPlugin } from "@expo/config-plugins";
+
+export interface MyCustomPluginOptions {
+	message?: string;
+	enabled?: boolean;
+}
+
+export const withMyCustomPlugin: ConfigPlugin<MyCustomPluginOptions> = (
+	config,
+	options = {},
+) => {
+	if (!options.enabled) {
+		console.log("🔸 My Custom Plugin: Disabled in configuration");
+		return config;
+	}
+
+	console.log("🟢 My Custom Plugin: Configuration started");
+	console.log("  Message:", options.message || "Default message");
+
+	// 여기에 플러그인 로직을 추가하세요
+	// 예: Android Manifest 수정, iOS Info.plist 수정 등
+
+	console.log("✅ My Custom Plugin: Configuration completed");
+
+	return config;
+};
+
+export default withMyCustomPlugin;
+```
+
+#### 4. 메인 tsconfig.json에 플러그인 등록
+
+`plugins/tsconfig.json` 파일을 수정하여 새로운 플러그인을 TypeScript Project References에 추가하세요:
+
+```json
+{
+	"files": [],
+	"references": [
+		{ "path": "./auth" },
+		{ "path": "./some" },
+		{ "path": "./my-custom-plugin" }
+	]
+}
+```
+
+#### 5. 플러그인 빌드
+
+플러그인을 빌드하여 사용 가능한 JavaScript 파일을 생성하세요:
+
+```bash
+npm run build:plugin
+```
+
+이 명령어는 `tsc --build ./plugins`를 실행하여 모든 플러그인을 빌드합니다.
+
+#### 6. app.json에서 플러그인 사용
+
+빌드 완료 후 `app.json`에서 플러그인을 사용할 수 있습니다:
+
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "./plugins/my-custom-plugin",
+        {
+          "message": "Hello from my custom plugin!",
+          "enabled": true
+        }
+      ]
+    ]
+  }
+}
+```
+
+#### 개발 워크플로우
+1. `src/index.ts`에서 플러그인 로직 개발
+2. `npm run build:plugin`으로 빌드
+3. `npx expo prebuild --clear`로 테스트
+4. 네이티브 설정이 올바르게 적용되었는지 확인
+
 ## 🛠️ 설정
 
 ### 앱 정보 수정

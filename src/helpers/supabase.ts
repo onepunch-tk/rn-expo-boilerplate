@@ -1,7 +1,4 @@
-import {
-	GoogleSignin,
-	statusCodes,
-} from "@react-native-google-signin/google-signin";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import {
 	type AuthChangeEvent,
 	AuthError,
@@ -10,6 +7,8 @@ import {
 	type User,
 } from "@supabase/supabase-js";
 import { AUTH_PROVIDERS } from "@/constants/auth";
+import KakaoCoreModule from "~/modules/kakao-core/";
+import KakaoUserModule from "~/modules/kakao-user";
 import { StorageHelper } from "./storage";
 
 const mmkvSupabaseSupportedStorage = {
@@ -71,25 +70,24 @@ export const SupabaseAuthHelper = {
 			webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID!,
 		});
 	},
+	initializeKakaoSDK() {
+		KakaoCoreModule.initializeKakaoSDK(
+			process.env.EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY!,
+		);
+	},
 	async signInWithGoogle() {
 		try {
 			await GoogleSignin.hasPlayServices();
 			const userInfo = await GoogleSignin.signIn();
-			console.log(
-				"signInWithGoogle userInfo: ",
-				JSON.stringify(userInfo, null, 2),
-			);
 
 			if (userInfo.data?.idToken) {
 				const { data, error } = await supabase.auth.signInWithIdToken({
 					provider: AUTH_PROVIDERS.GOOGLE,
 					token: userInfo.data.idToken,
 				});
-				console.log("signInWithGoogle data: ", JSON.stringify(data, null, 2));
 
 				return handleAuthResponse({ data, error });
 			} else {
-				console.log("signInWithGoogle userInfo.data?.idToken is null");
 				const error = new AuthError("NO_ID_TOKEN_FOUND");
 				return handleAuthResponse({
 					data: { user: null, session: null },
@@ -97,7 +95,6 @@ export const SupabaseAuthHelper = {
 				});
 			}
 		} catch (error) {
-			console.log("signInWithGoogle error: ", JSON.stringify(error, null, 2));
 			return handleAuthResponse({
 				data: { user: null, session: null },
 				error: error as AuthError,
@@ -121,12 +118,30 @@ export const SupabaseAuthHelper = {
 	},
 	async signInWithKakao() {
 		try {
-			const { data, error } = await supabase.auth.signInWithIdToken({
-				provider: AUTH_PROVIDERS.KAKAO,
-				token: "",
-			});
+			const {
+				success,
+				error: kakaoLoginError,
+				token,
+			} = await KakaoUserModule.login();
 
-			return handleAuthResponse({ data, error });
+			if (success && token?.idToken) {
+				const { data, error } = await supabase.auth.signInWithIdToken({
+					provider: AUTH_PROVIDERS.KAKAO,
+					token: token?.idToken,
+				});
+
+				return handleAuthResponse({ data, error });
+			} else if (kakaoLoginError) {
+				return handleAuthResponse({
+					data: { user: null, session: null },
+					error: new AuthError(kakaoLoginError),
+				});
+			} else {
+				return handleAuthResponse({
+					data: { user: null, session: null },
+					error: new AuthError("Unknown Error"),
+				});
+			}
 		} catch (error) {
 			return handleAuthResponse({
 				data: { user: null, session: null },

@@ -1,10 +1,12 @@
 default_kakao_version = '2.22.0'
 
 begin
-  # 더 안정적인 절대 경로 사용 - 현재 디렉토리에서 modules/kakaosdk-version.json 찾기
-  current_dir = Dir.pwd
-  version_info_path = File.join(current_dir, 'modules', 'kakaosdk-version.json')
-  puts "Debug: Current directory: #{current_dir}"
+  # podspec 파일 위치를 기준으로 kakaosdk-version.json 찾기
+  # 현재 파일: modules/kakao-core/ios/KakaoCore.podspec
+  # 타겟 파일: modules/kakaosdk-version.json
+  podspec_dir = File.dirname(__FILE__)
+  version_info_path = File.join(podspec_dir, '../../kakaosdk-version.json')
+  puts "Debug: Podspec directory: #{podspec_dir}"
   puts "Debug: podspec file location: #{__FILE__}"
   puts "Debug: Looking for version file at: #{version_info_path}"
   puts "Debug: File exists: #{File.exist?(version_info_path)}"

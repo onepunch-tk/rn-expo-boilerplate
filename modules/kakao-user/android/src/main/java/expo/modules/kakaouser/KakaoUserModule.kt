@@ -14,30 +14,23 @@ class KakaoUserModule : Module() {
 
     AsyncFunction("login") { promise: Promise ->
         val context = appContext.activityProvider?.currentActivity?: run {
-          return@AsyncFunction promise.resolve(KakaoLoginResult(error = "Activity Not Found"))
+          return@AsyncFunction promise.resolve(KakaoLoginResult.failure("[Kakao User Module] Error: Activity Not Found"))
         }
 
       val callback:(OAuthToken?, Throwable?) -> Unit = { oauthToken, error ->
-         if(error != null) {
-             promise.resolve(KakaoLoginResult(error = error.message))
-         } else if(oauthToken == null) {
-             promise.resolve(KakaoLoginResult(error="[Kakao User Module] Error: Not Found OAuth Token"))
-         } else {
-             val token = AuthTokenModel(
-                 accessToken = oauthToken.accessToken,
-                 refreshToken = oauthToken.refreshToken,
-                 idToken = oauthToken.idToken,
-                 accessTokenExpiresAt = oauthToken.accessTokenExpiresAt.unix.toDouble(),
-                 refreshTokenExpiresAt = oauthToken.refreshTokenExpiresAt.unix.toDouble(),
-                 accessTokenExpiresIn = diffSec(oauthToken.accessTokenExpiresAt, Date()).toDouble(),
-                 refreshTokenExpiresIn = diffSec(oauthToken.refreshTokenExpiresAt, Date()).toDouble(),
-                 scopes = oauthToken.scopes
-             )
-             promise.resolve(KakaoLoginResult(
-                 success = true,
-                 token = token
-             ))
-         }
+          when {
+              error != null -> promise.resolve(
+                  KakaoLoginResult.failure(
+                      error.message ?: "[Kakao User Module] Error: Unknown error"
+                  )
+              )
+
+              oauthToken == null -> promise.resolve(KakaoLoginResult.failure("[Kakao User Module] Error: Not Found OAuth Token"))
+              else -> {
+                  val token = AuthTokenModel.from(oauthToken)
+                  promise.resolve(KakaoLoginResult.success(token))
+              }
+          }
       }
 
         if(UserApiClient.instance.isKakaoTalkLoginAvailable(context)) {

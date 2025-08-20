@@ -1,6 +1,11 @@
 import ExpoModulesCore
 import KakaoSDKAuth
 
+protocol BaseResultProtocol {
+  var success: Bool { get set }
+  var error: String? { get set }
+}
+
 struct AuthTokenModel: Record {
   @Field
   var accessToken: String
@@ -28,35 +33,29 @@ struct AuthTokenModel: Record {
   
   @Field
   var scopes: [String]?
-  
-  init() {}
-  
-  init(accessToken: String, refreshToken: String, tokenType: String, idToken: String? = nil, accessTokenExpiresAt: TimeInterval, refreshTokenExpiresAt: TimeInterval, accessTokenExpiresIn: TimeInterval, refreshTokenExpiresIn: TimeInterval, scopes: [String]? = nil) {
-    self._accessToken = Field(wrappedValue: accessToken)
-    self._refreshToken = Field(wrappedValue: refreshToken)
-    self._tokenType = Field(wrappedValue: tokenType)
-    self._idToken = Field(wrappedValue: idToken)
-    self._accessTokenExpiresAt = Field(wrappedValue: accessTokenExpiresAt)
-    self._refreshTokenExpiresAt = Field(wrappedValue: refreshTokenExpiresAt)
-    self._accessTokenExpiresIn = Field(wrappedValue: accessTokenExpiresIn)
-    self._refreshTokenExpiresIn = Field(wrappedValue: refreshTokenExpiresIn)
-    self._scopes = Field(wrappedValue: scopes)
+}
+
+extension AuthTokenModel {
+  static func from(_ token: OAuthToken) -> Self {
+    var m = Self()
+    m._accessToken = Field(wrappedValue: token.accessToken)
+    m._refreshToken = Field(wrappedValue: token.refreshToken)
+    m._tokenType = Field(wrappedValue: token.tokenType)
+    m._idToken = Field(wrappedValue: token.idToken)
+    m._accessTokenExpiresAt = Field(wrappedValue: token.expiredAt.timeIntervalSince1970)
+    m._refreshTokenExpiresAt = Field(wrappedValue: token.refreshTokenExpiredAt.timeIntervalSince1970)
+    m._accessTokenExpiresIn = Field(wrappedValue: token.expiresIn)
+    m._refreshTokenExpiresIn = Field(wrappedValue: token.refreshTokenExpiresIn)
+    m._scopes = Field(wrappedValue: token.scopes)
+    return m
   }
 }
 
-struct KakaoLoginResult: Record {
+struct KakaoLoginResultModel: Record, BaseResultProtocol {
   @Field
-  var success: Bool
+  var success: Bool = false
   @Field
   var error: String? = nil
   @Field
   var token: AuthTokenModel? = nil
-  
-  init() {}
-  
-  init(success: Bool, error: String? = nil, token: AuthTokenModel? = nil) {
-    self._success = Field(wrappedValue: success)
-    self._error = Field(wrappedValue: error)
-    self._token = Field(wrappedValue: token)
-  }
 }

@@ -9,45 +9,24 @@ public class KakaoUserModule: Module {
 
     AsyncFunction("login") { (promise: Promise) in
       guard (try? KakaoSDK.shared.appKey()) != nil else {
-        let result = KakaoLoginResult(
-          success: false,
-          error: "Package-SDKNotInitialized",
-          token: nil
-        )
+        let result = KakaoLoginResultModel(error: "Package-SDKNotInitialized")
         return promise.resolve(result)
       }
 
       let callback = { (oauthToken: OAuthToken?, error: Error?) in
         if let error = error {
-          let result = KakaoLoginResult(
-            success: false,
-            error: error.localizedDescription,
-            token: nil
-          )
+          let result = KakaoLoginResultModel(error: error.localizedDescription)
           promise.resolve(result)
         } else if let token = oauthToken {
-          let tokenModel = AuthTokenModel(
-            accessToken: token.accessToken,
-            refreshToken: token.refreshToken,
-            tokenType: token.tokenType,
-            idToken: token.idToken,
-            accessTokenExpiresAt: token.expiredAt.timeIntervalSince1970,
-            refreshTokenExpiresAt: token.refreshTokenExpiredAt.timeIntervalSince1970,
-            accessTokenExpiresIn: token.expiresIn,
-            refreshTokenExpiresIn: token.refreshTokenExpiresIn,
-            scopes: token.scopes
-          )
-          let result = KakaoLoginResult(
+          let tokenModel = AuthTokenModel.from(token)
+          let result = KakaoLoginResultModel(
             success: true,
-            error: nil,
             token: tokenModel
           )
           promise.resolve(result)
         } else {
-          let result = KakaoLoginResult(
-            success: false,
+          let result = KakaoLoginResultModel(
             error: "Unknown Error",
-            token: nil
           )
           promise.resolve(result)
         }
@@ -57,6 +36,13 @@ public class KakaoUserModule: Module {
         UserApi.shared.loginWithKakaoTalk(completion: callback)
       } else {
         UserApi.shared.loginWithKakaoAccount(completion: callback)
+      }
+    }
+
+    AsyncFunction("logout") {
+      UserApi.shared.logout { error in
+        if let error {
+        } else {}
       }
     }
   }

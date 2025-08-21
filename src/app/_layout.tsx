@@ -9,7 +9,7 @@ import { AppProvider } from "@/context/AppContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { CrashlyticsHelper } from "@/helpers/crashlytics";
 import { storage } from "@/helpers/storage";
-import { SupabaseAuthHelper } from "@/helpers/supabase";
+import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaeAuthHelper";
 
 cssInterop(Feather, { className: { target: "style" } });
 

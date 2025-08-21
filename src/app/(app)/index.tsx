@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useAppContext } from "@/context/AppContext";
+import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaeAuthHelper";
 
 export default function HomePage() {
 	const { colorScheme, setColorScheme } = useAppContext();
@@ -27,6 +28,21 @@ export default function HomePage() {
 			await WebBrowser.openBrowserAsync(url);
 		} catch (error) {
 			console.error("링크 열기 실패:", error);
+		}
+	}
+
+	// 로그아웃 핸들러
+	async function handleLogout() {
+		try {
+			const { error } = await SupabaseAuthHelper.signOut();
+			if (error) {
+				console.error("로그아웃 실패:", error.message);
+				// TODO: 사용자에게 에러 메시지 표시
+			} else {
+				console.log("로그아웃 성공");
+			}
+		} catch (error) {
+			console.error("로그아웃 중 오류:", error);
 		}
 	}
 
@@ -61,6 +77,30 @@ export default function HomePage() {
 						<Text className="text-lg text-gray-600 dark:text-gray-300">
 							빠른 시작을 위한 Expo Start Kit
 						</Text>
+					</View>
+
+					{/* Account Section */}
+					<View className="mb-8">
+						<Text className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+							계정
+						</Text>
+
+						<TouchableOpacity
+							className="flex-row items-center bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800"
+							onPress={handleLogout}
+						>
+							<View className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg items-center justify-center mr-3">
+								<Feather className="text-red-500 text-2xl" name="log-out" />
+							</View>
+							<View className="flex-1">
+								<Text className="font-semibold text-red-900 dark:text-red-100">
+									로그아웃
+								</Text>
+								<Text className="text-sm text-red-700 dark:text-red-200">
+									계정에서 안전하게 로그아웃
+								</Text>
+							</View>
+						</TouchableOpacity>
 					</View>
 
 					{/* Core Features */}

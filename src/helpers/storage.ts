@@ -16,3 +16,10 @@ export const StorageHelper = {
 		storage.clearAll();
 	},
 };
+
+export const mmkvSupabaseSupportedStorage = {
+	getItem: async (key: string) => await StorageHelper.getItem(key),
+	setItem: async (key: string, value: string) =>
+		await StorageHelper.setItem(key, value),
+	removeItem: async (key: string) => await StorageHelper.removeItem(key),
+};

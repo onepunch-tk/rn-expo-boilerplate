@@ -141,7 +141,7 @@ console.log("Key Hash:", keyHash);
 
 **1. SDK 초기화** (`src/app/_layout.tsx` 참조):
 ```typescript
-import { SupabaseAuthHelper } from "@/helpers/supabase";
+import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaseAuthHelper";
 import { useEffect } from "react";
 
 export default function RootLayout() {
@@ -156,9 +156,9 @@ export default function RootLayout() {
 }
 ```
 
-**2. 로그인 구현** (`src/helpers/supabase.ts`, `src/app/(auth)/index.tsx` 참조):
+**2. 로그인 구현** (`src/helpers/supabase/SupabaseAuthHelper.ts`, `src/app/(auth)/index.tsx` 참조):
 ```typescript
-import { SupabaseAuthHelper } from "@/helpers/supabase";
+import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaseAuthHelper";
 
 async function handleKakaoLogin() {
   try {
@@ -291,7 +291,12 @@ npm run android:cc:stats # Android 캐시 통계만 확인
 │   ├── helpers/                  # 유틸리티 함수들
 │   │   ├── crashlytics.ts        # Firebase Crashlytics 헬퍼
 │   │   ├── storage.ts            # MMKV 스토리지 헬퍼
-│   │   └── supabase.ts           # Supabase 클라이언트 설정 및 인증 헬퍼
+│   │   └── supabase/             # Supabase 관련 모듈들
+│   │       ├── client.ts         # Supabase 클라이언트 생성 및 설정
+│   │       ├── env.ts            # 환경 변수 스키마 및 검증
+│   │       ├── SupabaseAuthHelper.ts # 인증 헬퍼 함수들
+│   │       ├── types.ts          # 공통 타입 정의
+│   │       └── utils.ts          # 유틸리티 함수들
 │   ├── hooks/                    # 커스텀 React 훅
 │   │   └── useOnboarding.ts      # 온보딩 상태 관리 훅
 │   └── types/                    # 타입 정의
@@ -382,6 +387,15 @@ const { isLoading, hasSeenOnboarding } = useOnboarding();
 
 ### 🔐 인증 시스템 (Supabase Auth)
 
+#### Supabase 모듈 구조
+새로운 구조에서는 Supabase 관련 기능이 모듈별로 분리되어 있습니다:
+
+- **`client.ts`**: Supabase 클라이언트 생성 및 MMKV 스토리지 연동
+- **`env.ts`**: 환경 변수 스키마 정의 및 검증 (zod 사용)
+- **`SupabaseAuthHelper.ts`**: 인증 관련 헬퍼 함수들 (Google, Kakao, Facebook 로그인)
+- **`types.ts`**: 공통 타입 정의 (Result, AuthResponse 등)
+- **`utils.ts`**: 유틸리티 함수들 (createAuthResult 등)
+
 #### AuthContext 컴포넌트
 - **위치**: `src/context/AuthContext.tsx`
 - **기능**: 
@@ -418,7 +432,7 @@ function MyComponent() {
 
 ##### 기본 세션 관리
 ```typescript
-import { SupabaseAuthHelper } from "@/helpers/supabase";
+import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaseAuthHelper";
 
 // 세션 상태 확인
 const { data: { session } } = await SupabaseAuthHelper.getSession();
@@ -434,7 +448,7 @@ SupabaseAuthHelper.onAuthStateChange((event, session) => {
 **⚠️ 중요**: Google 로그인을 사용하기 전에 반드시 `configureGoogleSignIn()`를 먼저 호출해야 합니다.
 
 ```typescript
-import { SupabaseAuthHelper } from "@/helpers/supabase";
+import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaseAuthHelper";
 import { useEffect } from "react";
 
 function LoginScreen() {
@@ -474,7 +488,7 @@ function LoginScreen() {
 **⚠️ 중요**: 카카오 로그인을 사용하기 전에 반드시 `initializeKakaoSDK()`를 먼저 호출해야 합니다.
 
 ```typescript
-import { SupabaseAuthHelper } from "@/helpers/supabase";
+import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaseAuthHelper";
 import { useEffect } from "react";
 
 function LoginScreen() {
@@ -514,6 +528,48 @@ function LoginScreen() {
 ```typescript
 // 사용자 로그아웃
 await SupabaseAuthHelper.signOut();
+```
+
+#### Supabase 클라이언트 직접 사용법
+
+고급 사용자의 경우 Supabase 클라이언트를 직접 사용하여 데이터베이스 작업을 수행할 수 있습니다:
+
+```typescript
+import { supabase } from "@/helpers/supabase/client";
+
+// 직접 클라이언트 사용 예시
+const { data, error } = await supabase
+  .from('users')
+  .select('*')
+  .eq('id', userId);
+
+// 커스텀 클라이언트 생성 (다른 설정이 필요한 경우)
+import { createSupabaseClient } from "@/helpers/supabase/client";
+
+const customClient = createSupabaseClient({
+  url: "https://custom-url.supabase.co",
+  anonKey: "custom-anon-key"
+});
+```
+
+#### 환경 변수 검증
+
+`env.ts` 모듈을 사용하여 환경 변수의 유효성을 확인할 수 있습니다:
+
+```typescript
+import { env, EnvSchema } from "@/helpers/supabase/env";
+
+// 환경 변수는 자동으로 검증됨
+console.log(env.EXPO_PUBLIC_SUPABASE_URL); // 검증된 URL
+console.log(env.EXPO_PUBLIC_SUPABASE_ANON_KEY); // 검증된 키
+
+// 런타임에 추가 검증이 필요한 경우
+try {
+  const validatedEnv = EnvSchema.parse(process.env);
+  console.log("환경 변수 검증 성공");
+} catch (error) {
+  console.error("환경 변수 검증 실패:", error);
+}
 ```
 
 #### KakaoUserModule 직접 사용법

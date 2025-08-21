@@ -1,7 +1,7 @@
 import { Text, TouchableOpacity, View } from "react-native";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAuth } from "@/context/AuthContext";
-import { SupabaseAuthHelper } from "@/helpers/supabase";
+import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaeAuthHelper";
 
 export default function Page() {
 	const { setIsAuthLoading, isAuthLoading } = useAuth();

@@ -7,7 +7,7 @@ import {
 	useState,
 } from "react";
 import { CrashlyticsHelper } from "@/helpers/crashlytics";
-import { SupabaseAuthHelper } from "@/helpers/supabase";
+import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaeAuthHelper";
 import type { AuthContextType } from "@/types/auth";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

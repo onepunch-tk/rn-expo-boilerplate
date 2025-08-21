@@ -244,13 +244,18 @@ ccache --version
 npm run script:permission
 
 # ccache를 사용한 빌드
-npm run ios:cc          # 디바이스용 빌드
-npm run ios:cc:sim      # 시뮬레이터용 빌드
+npm run ios:cc          # iOS 디바이스용 빌드
+npm run ios:cc:sim      # iOS 시뮬레이터용 빌드
 npm run android:cc      # Android 빌드
 
-# ccache 통계 확인
-npm run ios:cc:stats
-npm run android:cc:stats
+# ccache 통계 및 관리
+npm run ios:cc:stats    # iOS 캐시 통계만 확인
+npm run android:cc:stats # Android 캐시 통계만 확인
+
+# 고급 ccache 관리 (build-with-ccache.sh 직접 사용)
+./scripts/build-with-ccache.sh ios --clear          # iOS 캐시 완전 삭제
+./scripts/build-with-ccache.sh android --clear      # Android 캐시 완전 삭제
+./scripts/build-with-ccache.sh ios --reset-stats    # iOS 캐시 통계 초기화
 ```
 
 더 자세한 정보는 [ccache 공식 문서](https://ccache.dev/), [React Native 공식 문서](https://reactnative.dev/docs/build-speed)를 참고하세요.
@@ -322,8 +327,7 @@ npm run android:cc:stats
 │       ├── splash-icon.png       # 스플래시 아이콘
 │       └── ...                   # 기타 이미지들
 ├── scripts/                      # 빌드 스크립트
-│   ├── build-with-ccache.sh      # ccache 빌드 스크립트
-│   └── cache-utils.sh            # 캐시 유틸리티
+│   └── build-with-ccache.sh      # ccache 빌드 스크립트
 ├── android/                      # Android 프로젝트 (expo prebuild로 생성)
 ├── ios/                          # iOS 프로젝트 (expo prebuild로 생성)
 ├── google-services.json          # Firebase Android 설정

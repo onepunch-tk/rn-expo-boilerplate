@@ -1,4 +1,5 @@
 import ExpoModulesCore
+import KakaoCore
 import KakaoSDKAuth
 import KakaoSDKCommon
 import KakaoSDKUser
@@ -9,24 +10,28 @@ public class KakaoUserModule: Module {
 
     AsyncFunction("login") { (promise: Promise) in
       guard (try? KakaoSDK.shared.appKey()) != nil else {
-        let result = KakaoLoginResultModel(error: "Package-SDKNotInitialized")
+        let result = KakaoLoginResultModel(
+          error: KakaoErrorUtil.formatError(
+            from: Self.self, errorMessage: KakaoErrorUtil.CommonErrors.sdkNotInitialized))
         return promise.resolve(result)
       }
 
       let callback = { (oauthToken: OAuthToken?, error: Error?) in
         if let error = error {
-          let result = KakaoLoginResultModel(error: error.localizedDescription)
+          let result = KakaoLoginResultModel(
+            error: KakaoErrorUtil.formatError(
+              from: Self.self, errorMessage: error.localizedDescription))
           promise.resolve(result)
         } else if let token = oauthToken {
           let tokenModel = AuthTokenModel.from(token)
           let result = KakaoLoginResultModel(
             success: true,
-            token: tokenModel
-          )
+            token: tokenModel)
           promise.resolve(result)
         } else {
           let result = KakaoLoginResultModel(
-            error: "Unknown Error",
+            error: KakaoErrorUtil.formatError(
+              from: Self.self, errorMessage: KakaoErrorUtil.CommonErrors.tokenNotFound)
           )
           promise.resolve(result)
         }

@@ -42,6 +42,7 @@ Pod::Spec.new do |s|
   s.static_framework = true
 
   s.dependency 'ExpoModulesCore'
+  s.dependency 'KakaoCore'
   s.dependency 'KakaoSDKAuth', sdk_auth_version
   s.dependency 'KakaoSDKUser', sdk_user_version
   

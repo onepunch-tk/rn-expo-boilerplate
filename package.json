@@ -12,7 +12,7 @@
 		"ios:cc:stats": "./scripts/build-with-ccache.sh ios --stats",
 		"android:cc": "./scripts/build-with-ccache.sh android",
 		"android:cc:stats": "./scripts/build-with-ccache.sh android --stats",
-		"script:permission": "chmod +x ./scripts/build-with-ccache.sh ./scripts/cache-utils.sh",
+		"script:permission": "chmod +x ./scripts/build-with-ccache.sh",
 		"build:plugin": "tsc --build ./plugins",
 		"web": "expo start --web",
 		"lint": "expo lint"

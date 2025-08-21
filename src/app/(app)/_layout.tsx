@@ -6,5 +6,5 @@ export default function Layout() {
 	if (!authUser) {
 		return <Redirect href="/(auth)" />;
 	}
-	return <Stack />;
+	return <Stack screenOptions={{ headerShown: true }} />;
 }

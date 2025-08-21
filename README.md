@@ -51,18 +51,23 @@ EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY=your_kakao_native_app_key
    - **중요**: 개발 및 디버깅을 위해서는 **Test App**을 생성해야 합니다
    - Test App을 생성해야만 `account_email` verification error가 발생하지 않습니다
 
-2. **앱 설정 > 플랫폼 설정**에서 iOS/Android 플랫폼 추가:
+2. **카카오 로그인 > 설정하기 > 일반**에서 OpenID Connect 활성화:
+   - **Supabase 연동에 필수**: Supabase Auth Provider로 카카오를 사용하려면 반드시 OpenID Connect를 활성화해야 합니다
+   - 카카오 로그인 설정 페이지에서 **OpenID Connect** 토글을 활성화
+   - 자세한 설정 방법은 [카카오 로그인 설정하기](https://developers.kakao.com/docs/latest/ko/kakaologin/prerequisite#kakao-login-oidc) 참고
+
+3. **앱 설정 > 플랫폼 설정**에서 iOS/Android 플랫폼 추가:
    - **Android**: 패키지명과 키 해시 등록
    - **iOS**: 번들 ID 등록
 
-3. **카카오 로그인 > 동의항목**에서 필수 항목 활성화:
+4. **카카오 로그인 > 동의항목**에서 필수 항목 활성화:
    - `account_email` (필수)
    - `profile_nickname` (선택)
    - `profile_image` (선택)
 
-4. **보안 > Client Secret** 생성 및 활성화
+5. **보안 > Client Secret** 생성 및 활성화
 
-5. 앱 키 확인:
+6. 앱 키 확인:
    - Native 앱 키 (SDK 초기화용)
 
 ### 5. Supabase Authentication Provider 설정
@@ -510,6 +515,119 @@ function LoginScreen() {
 // 사용자 로그아웃
 await SupabaseAuthHelper.signOut();
 ```
+
+#### KakaoUserModule 직접 사용법
+
+**⚠️ 고급 사용법**: SupabaseAuthHelper 외에 카카오 SDK의 추가 기능이 필요한 경우, KakaoUserModule을 직접 호출할 수 있습니다.
+
+##### 모듈 Import
+```typescript
+import KakaoUserModule from "~/modules/kakao-user";
+```
+
+##### 사용 가능한 메서드들
+
+**1. 직접 카카오 로그인**
+```typescript
+try {
+  const result = await KakaoUserModule.login();
+  
+  if (result.success && result.token) {
+    console.log('카카오 로그인 성공');
+    console.log('Access Token:', result.token.accessToken);
+    console.log('Refresh Token:', result.token.refreshToken);
+    console.log('토큰 만료 시간:', result.token.accessTokenExpiresAt);
+    console.log('스코프:', result.token.scopes);
+  } else {
+    console.error('카카오 로그인 실패:', result.error);
+  }
+} catch (error) {
+  console.error('카카오 로그인 에러:', error);
+}
+```
+
+**2. 로그인 상태 확인**
+```typescript
+try {
+  const result = await KakaoUserModule.isLogined();
+  
+  if (result.isLogined) {
+    console.log('카카오에 로그인되어 있음');
+  } else {
+    console.log('카카오에 로그인되어 있지 않음');
+  }
+  
+  if (result.error) {
+    console.error('로그인 상태 확인 에러:', result.error);
+  }
+} catch (error) {
+  console.error('로그인 상태 확인 실패:', error);
+}
+```
+
+**3. 액세스 토큰 정보 가져오기**
+```typescript
+try {
+  const result = await KakaoUserModule.getAccessToken();
+  
+  if (result.accessToken) {
+    console.log('토큰 ID:', result.accessToken.id);
+    console.log('앱 ID:', result.accessToken.appId);
+    console.log('만료까지 남은 시간(초):', result.accessToken.expiresIn);
+  } else {
+    console.log('액세스 토큰이 없습니다');
+  }
+  
+  if (result.error) {
+    console.error('토큰 정보 가져오기 에러:', result.error);
+  }
+} catch (error) {
+  console.error('토큰 정보 가져오기 실패:', error);
+}
+```
+
+**4. 카카오 로그아웃**
+```typescript
+try {
+  const result = await KakaoUserModule.logout();
+  
+  if (result.success) {
+    console.log('카카오 로그아웃 성공');
+  } else {
+    console.error('카카오 로그아웃 실패:', result.error);
+  }
+} catch (error) {
+  console.error('카카오 로그아웃 에러:', error);
+}
+```
+
+**5. 카카오 연결 해제 (탈퇴)**
+```typescript
+try {
+  const result = await KakaoUserModule.unlink();
+  
+  if (result.success) {
+    console.log('카카오 연결 해제 성공');
+    // 사용자의 카카오 계정 연결이 완전히 해제됨
+  } else {
+    console.error('카카오 연결 해제 실패:', result.error);
+  }
+} catch (error) {
+  console.error('카카오 연결 해제 에러:', error);
+}
+```
+
+##### 언제 직접 사용하나요?
+
+- **세밀한 토큰 관리**: 액세스 토큰의 만료 시간을 직접 확인하고 관리해야 할 때
+- **카카오 전용 기능**: Supabase를 거치지 않고 카카오 API를 직접 호출해야 할 때  
+- **로그인 상태 실시간 확인**: 주기적으로 카카오 로그인 상태를 체크해야 할 때
+- **완전한 연결 해제**: 사용자가 앱과 카카오 계정의 연결을 완전히 해제하려 할 때
+
+**⚠️ 주의사항**: 
+- KakaoUserModule을 직접 사용할 때는 Supabase 인증 상태와 동기화되지 않을 수 있습니다
+- 대부분의 경우 `SupabaseAuthHelper`를 사용하는 것이 권장됩니다
+- 직접 사용 시에는 에러 처리를 꼼꼼히 해주세요
 
 ### 🌙 앱 컨텍스트 시스템
 

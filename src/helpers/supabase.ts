@@ -124,10 +124,6 @@ export const SupabaseAuthHelper = {
 				token,
 			} = await KakaoUserModule.login();
 
-			console.log("kakaoLoginError", kakaoLoginError);
-			console.log("success", success);
-			console.log("token", JSON.stringify(token, null, 2));
-
 			if (success && token?.idToken) {
 				const { data, error } = await supabase.auth.signInWithIdToken({
 					provider: AUTH_PROVIDERS.KAKAO,

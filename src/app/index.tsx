@@ -5,12 +5,10 @@ import { useAuth } from "@/context/AuthContext";
 import { useOnboarding } from "@/hooks/useOnboarding";
 
 export default function Index() {
-	const { isLoading: isLoadingOnboarding, hasSeenOnboarding } = useOnboarding();
-	const { authUser, isLoading: isLoadingAuth } = useAuth();
+	const { isLoading: isOnboardingLoading, hasSeenOnboarding } = useOnboarding();
+	const { authUser, isAuthLoading } = useAuth();
 
-	console.log("authUser: ", authUser ? "true" : "false");
-
-	if (isLoadingAuth || isLoadingOnboarding) {
+	if (isAuthLoading || isOnboardingLoading) {
 		return <LoadingScreen />;
 	}
 

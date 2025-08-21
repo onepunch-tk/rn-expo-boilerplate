@@ -1,6 +1,7 @@
 import type { User } from "@supabase/supabase-js";
 
 export interface AuthContextType {
-	isLoading: boolean;
+	isAuthLoading: boolean;
+	setIsAuthLoading: (isAuthLoading: boolean) => void;
 	authUser: User | null;
 }

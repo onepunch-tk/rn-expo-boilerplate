@@ -1,13 +1,23 @@
 import { Text, TouchableOpacity, View } from "react-native";
+import { LoadingScreen } from "@/components/LoadingScreen";
+import { useAuth } from "@/context/AuthContext";
 import { SupabaseAuthHelper } from "@/helpers/supabase";
 
 export default function Page() {
+	const { setIsAuthLoading, isAuthLoading } = useAuth();
+
 	async function handleLoginWithKakaoTalk() {
+		setIsAuthLoading(true);
 		await SupabaseAuthHelper.signInWithKakao();
 	}
 
 	async function handleLoginWithGoogle() {
+		setIsAuthLoading(true);
 		await SupabaseAuthHelper.signInWithGoogle();
+	}
+
+	if (isAuthLoading) {
+		return <LoadingScreen />;
 	}
 
 	return (

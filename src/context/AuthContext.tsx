@@ -14,20 +14,21 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: PropsWithChildren) {
 	const [authUser, setAuthUser] = useState<User | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
+	const [isAuthLoading, setIsAuthLoading] = useState(true);
 
 	useEffect(() => {
 		async function handleAuthSession(session: Session | null) {
 			setAuthUser(session?.user ?? null);
-			await CrashlyticsHelper.setUserId(session?.user?.id ?? "anonymous");
+
+			await CrashlyticsHelper.setUserId(session?.user?.id ?? null);
 			await CrashlyticsHelper.setAttributes({
-				email: session?.user?.email ?? "",
-				provider: session?.user?.app_metadata.provider ?? "",
+				email: session?.user?.email ?? "anonymous",
+				provider: session?.user?.user_metadata?.provider_id ?? "anonymous",
 			});
 		}
 		SupabaseAuthHelper.getSession().then(async ({ data: { session } }) => {
 			await handleAuthSession(session);
-			setIsLoading(false);
+			setIsAuthLoading(false);
 		});
 
 		// 인증 상태 변경 구독 (cleanup 추가!)
@@ -35,7 +36,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 			data: { subscription },
 		} = SupabaseAuthHelper.onAuthStateChange(async (_event, session) => {
 			await handleAuthSession(session);
-			setIsLoading(false); // 로그인/로그아웃 시 로딩 해제
+			setIsAuthLoading(false); // 로그인/로그아웃 시 로딩 해제
 		});
 
 		return () => {
@@ -46,8 +47,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
 	return (
 		<AuthContext.Provider
 			value={{
-				isLoading,
+				isAuthLoading,
 				authUser,
+				setIsAuthLoading,
 			}}
 		>
 			{children}

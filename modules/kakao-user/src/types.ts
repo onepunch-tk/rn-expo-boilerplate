@@ -1,6 +1,12 @@
 export interface BaseResult {
 	success: boolean;
-	error?: string;
+	error?: string | null;
+}
+
+export interface AccessTokenInfo {
+	id: number;
+	appId: number;
+	expiresIn: number;
 }
 
 export interface KakaoAuthToken {
@@ -17,4 +23,12 @@ export interface KakaoAuthToken {
 
 export interface KakaoLoginResult extends BaseResult {
 	token: KakaoAuthToken | null;
+}
+
+export interface KakaoLogoutResult extends BaseResult {}
+export interface KakaoIsLogined extends Pick<BaseResult, "error"> {
+	isLogined: boolean;
+}
+export interface KakaoAccessTokenResult extends Pick<BaseResult, "error"> {
+	accessToken?: AccessTokenInfo | null;
 }

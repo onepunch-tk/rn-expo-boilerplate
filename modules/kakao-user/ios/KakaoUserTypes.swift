@@ -1,5 +1,6 @@
 import ExpoModulesCore
 import KakaoSDKAuth
+import KakaoSDKUser
 
 protocol BaseResultProtocol {
   var success: Bool { get set }
@@ -9,28 +10,28 @@ protocol BaseResultProtocol {
 struct AuthTokenModel: Record {
   @Field
   var accessToken: String
-  
+
   @Field
   var refreshToken: String
-  
+
   @Field
   var tokenType: String
-  
+
   @Field
   var idToken: String?
-  
+
   @Field
   var accessTokenExpiresAt: TimeInterval
-  
+
   @Field
   var refreshTokenExpiresAt: TimeInterval
-  
+
   @Field
   var accessTokenExpiresIn: TimeInterval
-  
+
   @Field
   var refreshTokenExpiresIn: TimeInterval
-  
+
   @Field
   var scopes: [String]?
 }
@@ -58,4 +59,44 @@ struct KakaoLoginResultModel: Record, BaseResultProtocol {
   var error: String? = nil
   @Field
   var token: AuthTokenModel? = nil
+}
+
+struct KakaoLogoutResult: Record, BaseResultProtocol {
+  @Field
+  var success: Bool = false
+  @Field
+  var error: String? = nil
+}
+
+struct KakaoIsLogined: Record {
+  @Field
+  var isLogined: Bool = false
+  @Field
+  var error: String? = nil
+}
+
+struct AccessTokenInfoModel: Record {
+  @Field
+  var id: Int64?
+  @Field
+  var appId: Int64 = 0
+  @Field
+  var expiresIn: Int64 = 0
+}
+
+extension AccessTokenInfoModel {
+  static func from(_ accessToken: AccessTokenInfo) -> Self {
+    var m = Self()
+    m._id = Field(wrappedValue: accessToken.id)
+    m._appId = Field(wrappedValue: accessToken.appId)
+    m._expiresIn = Field(wrappedValue: accessToken.expiresIn)
+    return m
+  }
+}
+
+struct KakaoAccessTokenResult: Record {
+  @Field
+  var accessTokenInfo: AccessTokenInfoModel? = nil
+  @Field
+  var error: String? = nil
 }

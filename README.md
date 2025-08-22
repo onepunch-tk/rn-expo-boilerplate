@@ -25,23 +25,57 @@ EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=your_google_web_client_id
 EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY=your_kakao_native_app_key
 ```
 
-### 3. Firebase 설정 (Crashlytics용)
+### 3. Firebase 프로젝트 설정
+
+Firebase는 OAuth 인증과 Crashlytics 서비스 두 가지 목적으로 사용됩니다. 각각의 설정 방법을 알아보겠습니다.
+
+#### 3-1. 기본 Firebase 프로젝트 생성
 
 1. [Firebase Console](https://console.firebase.google.com/)에서 새 프로젝트 생성
-
-2. **Google OAuth 설정 (Google 로그인 기능이 필요한 경우)**
-   - Firebase Console에서 Authentication > Sign-in method로 이동
-   - Google 제공업체를 활성화
-   - Android 앱 설정에서 SHA-1 지문 등록:
-     ```bash
-     # Debug keystore SHA-1 확인 (개발용)
-     keytool -list -v -alias androiddebugkey -keystore ~/.android/debug.keystore
-     # 비밀번호: android
-     ```
-   - 출력에서 `SHA1:` 뒤의 지문을 복사하여 Firebase Console > 프로젝트 설정 > SHA 인증서 지문에 추가
-
+2. 프로젝트 이름과 설정을 입력하여 프로젝트 생성 완료
 3. `google-services.json` (Android)와 `GoogleService-Info.plist` (iOS) 다운로드
 4. 이 파일들을 프로젝트 루트 디렉토리에 배치
+
+#### 3-2. Google OAuth 인증 설정 (선택사항)
+
+**Google 로그인 기능이 필요한 경우에만 설정하세요.**
+
+1. **Authentication 서비스 활성화**
+   - Firebase Console에서 **Authentication** > **Sign-in method**로 이동
+   - **Google** 제공업체를 클릭하여 활성화
+   - 프로젝트 지원 이메일을 설정
+
+2. **Android SHA-1 지문 등록** (Android 앱 지원시)
+   ```bash
+   # Debug keystore SHA-1 확인 (개발용)
+   keytool -list -v -alias androiddebugkey -keystore ~/.android/debug.keystore
+   # 비밀번호: android
+   ```
+   - 출력에서 `SHA1:` 뒤의 지문을 복사
+   - Firebase Console > **프로젝트 설정** > **일반** > **내 앱** > **SHA 인증서 지문**에 추가
+
+3. **Web Client ID 확인**
+   - Firebase Console > **프로젝트 설정** > **일반** > **웹 API 키**에서 웹 클라이언트 ID 확인
+   - 이 값을 `.env` 파일의 `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`에 설정
+
+#### 3-3. Firebase Crashlytics 설정 (선택사항)
+
+**앱의 오류 추적 및 분석이 필요한 경우에만 설정하세요.**
+
+1. **Crashlytics 서비스 활성화**
+   - Firebase Console에서 **Crashlytics**를 클릭
+   - **시작하기** 버튼을 클릭하여 서비스 활성화
+   - 설정 안내에 따라 진행
+
+2. **데이터 수집 활성화**
+   - Crashlytics 대시보드에서 **데이터 수집 활성화** 확인
+   - 첫 번째 충돌 리포트가 도착할 때까지 대기
+
+3. **테스트 충돌 발생** (선택사항)
+   - 앱에서 의도적으로 오류를 발생시켜 Crashlytics 연동 테스트
+   - Firebase Console에서 충돌 리포트 확인
+
+> **💡 참고**: OAuth와 Crashlytics는 독립적으로 설정 가능합니다. 필요한 기능만 선택하여 설정하세요.
 
 ### 4. 카카오 개발자 콘솔 설정
 
@@ -790,6 +824,10 @@ await StorageHelper.setItem(COLOR_SCHEME_KEY, newScheme);
 ```
 
 ### 🚨 Firebase Crashlytics
+
+Firebase Crashlytics는 앱의 오류를 실시간으로 추적하고 분석하는 서비스입니다.
+
+> **📋 참고**: Crashlytics를 사용하려면 먼저 [Firebase 프로젝트 설정](#3-3-firebase-crashlytics-설정-선택사항)에서 서비스를 활성화해야 합니다.
 
 #### Crashlytics Helper 사용법
 - **위치**: `src/helpers/crashlytics.ts`

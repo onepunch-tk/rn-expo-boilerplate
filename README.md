@@ -1,6 +1,6 @@
-# React Native Expo 보일러플레이트
+# React Native Expo Starter Kit
 
-React Native 앱을 빠르게 시작할 수 있는 보일러플레이트입니다. Expo 53 기반으로 제작되었으며, 온보딩, 인증, 로컬 스토리지, 애니메이션 등 핵심 기능들이 구현되어 있습니다.
+React Native 앱을 빠르게 시작할 수 있는 Starter Kit입니다. Expo 53 기반으로 제작되었으며, 온보딩, 인증, 로컬 스토리지, 애니메이션 등 핵심 기능들이 구현되어 있습니다.
 
 ## 🚀 필수 설정 (Required Setup)
 

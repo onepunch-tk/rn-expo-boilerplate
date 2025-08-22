@@ -6,7 +6,7 @@ export function useOnboarding() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	// biome-ignore lint/correctness/useExhaustiveDependencies: dev mode only
 	useEffect(() => {
 		checkOnboarding();
 	}, []);

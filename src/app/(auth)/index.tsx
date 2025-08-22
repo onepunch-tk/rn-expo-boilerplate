@@ -1,19 +1,30 @@
+import { StatusBar } from "expo-status-bar";
 import { Text, TouchableOpacity, View } from "react-native";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { useAppContext } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
 import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaeAuthHelper";
+import FacebookLogo from "~/assets/images/brand-logo/facebook.svg";
+import GoogleLogo from "~/assets/images/brand-logo/google.svg";
+import KakaoTalkLogo from "~/assets/images/brand-logo/kakaotalk.svg";
 
 export default function Page() {
 	const { setIsAuthLoading, isAuthLoading } = useAuth();
+	const { colorScheme } = useAppContext();
 
-	async function handleLoginWithKakaoTalk() {
+	async function handleSocialSignin(provider: "kakao" | "google" | "facebook") {
 		setIsAuthLoading(true);
-		await SupabaseAuthHelper.signInWithKakao();
-	}
-
-	async function handleLoginWithGoogle() {
-		setIsAuthLoading(true);
-		await SupabaseAuthHelper.signInWithGoogle();
+		switch (provider) {
+			case "kakao":
+				await SupabaseAuthHelper.signInWithKakao();
+				break;
+			case "google":
+				await SupabaseAuthHelper.signInWithGoogle();
+				break;
+			case "facebook":
+				await SupabaseAuthHelper.signInWithFacebook();
+				break;
+		}
 	}
 
 	if (isAuthLoading) {
@@ -21,19 +32,82 @@ export default function Page() {
 	}
 
 	return (
-		<View className="flex-1 justify-center items-center">
-			<TouchableOpacity
-				className="bg-black p-4 rounded-md"
-				onPress={handleLoginWithKakaoTalk}
-			>
-				<Text className="text-white">SignIn With Kakao</Text>
-			</TouchableOpacity>
-			<TouchableOpacity
-				className="bg-black p-4 rounded-md"
-				onPress={handleLoginWithGoogle}
-			>
-				<Text className="text-white">SignIn With Google</Text>
-			</TouchableOpacity>
-		</View>
+		<>
+			<View className="flex-1 bg-white dark:bg-gray-900 px-10">
+				<View className="flex-1 px-6 py-8 justify-center min-h-screen">
+					{/* Welcome Section */}
+					<View className="mb-8 items-center">
+						<Text className="text-3xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+							환영합니다! 👋
+						</Text>
+						<Text className="text-lg text-gray-600 dark:text-gray-300 text-center">
+							계속하려면 로그인해주세요
+						</Text>
+					</View>
+
+					<View className="gap-y-4">
+						{/* Kakao Login */}
+						<View className="w-full bg-[#FFCD00] px-2 py-1 rounded-2xl border-2 border-[#FEE500]">
+							<TouchableOpacity
+								className="flex-row"
+								onPress={() => handleSocialSignin("kakao")}
+							>
+								<View className="bg-[#FFCD00] rounded-full p-1 justify-center items-center w-[50px] h-[50px]">
+									<KakaoTalkLogo fill={"black"} width={50} height={50} />
+								</View>
+								<View className="flex-1 justify-center items-center">
+									<Text className="text-black font-semibold text-lg">
+										카카오톡으로 계속하기
+									</Text>
+								</View>
+							</TouchableOpacity>
+						</View>
+
+						{/* Google Login */}
+						<View className="w-full bg-white px-2 py-1 rounded-2xl border-2 border-[#4285F4] dark:bg-gray-800 dark:border-[#4285F4]">
+							<TouchableOpacity
+								className="flex-row"
+								onPress={() => handleSocialSignin("google")}
+							>
+								<View className="items-center rounded-full p-1 justify-center w-[50px] h-[50px]">
+									<GoogleLogo width={40} height={40} />
+								</View>
+								<View className="flex-1 justify-center items-center">
+									<Text className="text-black dark:text-white font-semibold text-lg">
+										구글 계정으로 계속하기
+									</Text>
+								</View>
+							</TouchableOpacity>
+						</View>
+
+						{/* Facebook Login */}
+						<View className="w-full bg-[#0866FF] px-2 py-1 rounded-2xl border-2 border-[#1877F2]">
+							<TouchableOpacity
+								className="flex-row"
+								onPress={() => handleSocialSignin("facebook")}
+							>
+								<View className="items-center rounded-full p-1 justify-center w-[50px] h-[50px]">
+									<FacebookLogo fill="white" width={45} height={45} />
+								</View>
+								<View className="flex-1 justify-center items-center">
+									<Text className="text-white font-semibold text-lg">
+										페이스북으로 계속하기
+									</Text>
+								</View>
+							</TouchableOpacity>
+						</View>
+					</View>
+				</View>
+			</View>
+			<StatusBar
+				style={
+					colorScheme === "system"
+						? "auto"
+						: colorScheme === "dark"
+							? "light"
+							: "dark"
+				}
+			/>
+		</>
 	);
 }

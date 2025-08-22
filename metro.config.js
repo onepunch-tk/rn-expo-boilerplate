@@ -3,16 +3,16 @@ const { withNativeWind } = require("nativewind/metro");
 
 const config = getDefaultConfig(__dirname);
 
-const ALIASES = {
-	"@plugins/kakao-auth": "./modules/kakao-auth-module/app.plugin.js",
-};
+const { transformer, resolver } = config;
 
-config.resolver.resolveRequest = (context, moduleName, platform) => {
-	return context.resolveRequest(
-		context,
-		ALIASES[moduleName] ?? moduleName,
-		platform,
-	);
+config.transformer = {
+	...transformer,
+	babelTransformerPath: require.resolve("react-native-svg-transformer/expo"),
+};
+config.resolver = {
+	...resolver,
+	assetExts: resolver.assetExts.filter((ext) => ext !== "svg"),
+	sourceExts: [...resolver.sourceExts, "svg"],
 };
 
 module.exports = withNativeWind(config, { input: "./global.css" });

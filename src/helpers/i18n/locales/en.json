@@ -1,0 +1,63 @@
+{
+	"common": {
+		"welcome": "Welcome! 👋",
+		"logout": "Logout",
+		"usefulLinks": "Useful Links",
+		"selectLanguage": "Select Language"
+	},
+	"home": {
+		"title": "React Native Expo 🚀",
+		"subtitle": "Expo Start Kit for rapid app development",
+		"account": "Account",
+		"logoutDescription": "Safely logout from your account",
+		"coreFeatures": "Core Features",
+		"features": {
+			"authentication": {
+				"title": "Authentication System",
+				"description": "Supabase + Kakao/Google/Facebook"
+			},
+			"onboarding": {
+				"title": "Onboarding",
+				"description": "Swipe Interactions"
+			},
+			"storage": {
+				"title": "Local Storage",
+				"description": "High-performance MMKV"
+			},
+			"styling": {
+				"title": "Styling",
+				"description": "NativeWind (TailwindCSS)"
+			},
+			"animation": {
+				"title": "Animation",
+				"description": "React Native Reanimated"
+			},
+			"errorTracking": {
+				"title": "Error Tracking",
+				"description": "Firebase Crashlytics"
+			}
+		},
+		"links": {
+			"expo": "Expo 53 Documentation",
+			"supabase": "Supabase Guide",
+			"nativewind": "NativeWind Documentation",
+			"reanimated": "Reanimated 3",
+			"kakao": "Kakao Developers"
+		}
+	},
+	"auth": {
+		"welcomeMessage": "Welcome! 👋",
+		"loginPrompt": "Please login to continue",
+		"socialLogin": {
+			"kakao": "Sign in with KakaoTalk",
+			"google": "Sign in with Google",
+			"facebook": "Sign in with Facebook"
+		}
+	},
+	"errors": {
+		"linkOpenFailed": "Failed to open link:",
+		"logoutFailed": "Logout failed:",
+		"logoutError": "Error during logout:",
+		"logoutSuccess": "Logout successful"
+	}
+}

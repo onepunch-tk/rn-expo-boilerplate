@@ -12,7 +12,10 @@
 			"googleServicesFile": "./GoogleService-Info.plist",
 			"supportsTablet": true,
 			"bundleIdentifier": "com.taekyung.rnexpoboilerplate",
-			"appleTeamId": "63KCC5ADLW"
+			"appleTeamId": "63KCC5ADLW",
+			"infoPlist": {
+				"CFBundleAllowMixedLocalizations": true
+			}
 		},
 		"android": {
 			"googleServicesFile": "./google-services.json",
@@ -65,10 +68,19 @@
 						"androidEnabled": true
 					}
 				}
-			]
+			],
+			"expo-localization"
 		],
 		"experiments": {
 			"typedRoutes": true
+		},
+		"extra": {
+			"supportsRTL": true
+		},
+		"locales": {
+			"en": "./src/helpers/i18n/locales/en.json",
+			"ko": "./src/helpers/i18n/locales/ko.json",
+			"ar": "./src/helpers/i18n/locales/ar.json"
 		}
 	}
 }

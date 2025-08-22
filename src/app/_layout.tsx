@@ -10,6 +10,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { CrashlyticsHelper } from "@/helpers/crashlytics";
 import { storage } from "@/helpers/storage";
 import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaeAuthHelper";
+import "@/helpers/i18n/config";
 
 cssInterop(Feather, { className: { target: "style" } });
 

@@ -1,0 +1,63 @@
+{
+	"common": {
+		"welcome": "أهلاً وسهلاً! 👋",
+		"logout": "تسجيل الخروج",
+		"usefulLinks": "روابط مفيدة",
+		"selectLanguage": "اختر اللغة"
+	},
+	"home": {
+		"title": "React Native Expo 🚀",
+		"subtitle": "مجموعة أدوات Expo لتطوير التطبيقات بسرعة",
+		"account": "الحساب",
+		"logoutDescription": "تسجيل الخروج بأمان من حسابك",
+		"coreFeatures": "الميزات الأساسية",
+		"features": {
+			"authentication": {
+				"title": "نظام المصادقة",
+				"description": "Supabase + كاكاو/جوجل/فيسبوك"
+			},
+			"onboarding": {
+				"title": "التعريف بالتطبيق",
+				"description": "تفاعلات السحب"
+			},
+			"storage": {
+				"title": "التخزين المحلي",
+				"description": "MMKV عالي الأداء"
+			},
+			"styling": {
+				"title": "التصميم",
+				"description": "NativeWind (TailwindCSS)"
+			},
+			"animation": {
+				"title": "الرسوم المتحركة",
+				"description": "React Native Reanimated"
+			},
+			"errorTracking": {
+				"title": "تتبع الأخطاء",
+				"description": "Firebase Crashlytics"
+			}
+		},
+		"links": {
+			"expo": "وثائق Expo 53",
+			"supabase": "دليل Supabase",
+			"nativewind": "وثائق NativeWind",
+			"reanimated": "Reanimated 3",
+			"kakao": "مطوري كاكاو"
+		}
+	},
+	"auth": {
+		"welcomeMessage": "أهلاً وسهلاً! 👋",
+		"loginPrompt": "يرجى تسجيل الدخول للمتابعة",
+		"socialLogin": {
+			"kakao": "المتابعة مع KakaoTalk",
+			"google": "المتابعة مع حساب جوجل",
+			"facebook": "المتابعة مع فيسبوك"
+		}
+	},
+	"errors": {
+		"linkOpenFailed": "فشل في فتح الرابط:",
+		"logoutFailed": "فشل تسجيل الخروج:",
+		"logoutError": "خطأ أثناء تسجيل الخروج:",
+		"logoutSuccess": "تم تسجيل الخروج بنجاح"
+	}
+}

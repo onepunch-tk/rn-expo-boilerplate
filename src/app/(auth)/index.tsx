@@ -1,4 +1,5 @@
 import { StatusBar } from "expo-status-bar";
+import { useTranslation } from "react-i18next";
 import { Text, TouchableOpacity, View } from "react-native";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAppContext } from "@/context/AppContext";
@@ -9,6 +10,7 @@ import GoogleLogo from "~/assets/images/brand-logo/google.svg";
 import KakaoTalkLogo from "~/assets/images/brand-logo/kakaotalk.svg";
 
 export default function Page() {
+	const { t } = useTranslation();
 	const { setIsAuthLoading, isAuthLoading } = useAuth();
 	const { colorScheme } = useAppContext();
 
@@ -38,10 +40,10 @@ export default function Page() {
 					{/* Welcome Section */}
 					<View className="mb-8 items-center">
 						<Text className="text-3xl font-bold text-gray-900 dark:text-white mb-2 text-center">
-							환영합니다! 👋
+							{t("auth.welcomeMessage")}
 						</Text>
 						<Text className="text-lg text-gray-600 dark:text-gray-300 text-center">
-							계속하려면 로그인해주세요
+							{t("auth.loginPrompt")}
 						</Text>
 					</View>
 
@@ -57,7 +59,7 @@ export default function Page() {
 								</View>
 								<View className="flex-1 justify-center items-center">
 									<Text className="text-black font-semibold text-lg">
-										카카오톡으로 계속하기
+										{t("auth.socialLogin.kakao")}
 									</Text>
 								</View>
 							</TouchableOpacity>
@@ -74,7 +76,7 @@ export default function Page() {
 								</View>
 								<View className="flex-1 justify-center items-center">
 									<Text className="text-black dark:text-white font-semibold text-lg">
-										구글 계정으로 계속하기
+										{t("auth.socialLogin.google")}
 									</Text>
 								</View>
 							</TouchableOpacity>
@@ -91,7 +93,7 @@ export default function Page() {
 								</View>
 								<View className="flex-1 justify-center items-center">
 									<Text className="text-white font-semibold text-lg">
-										페이스북으로 계속하기
+										{t("auth.socialLogin.facebook")}
 									</Text>
 								</View>
 							</TouchableOpacity>

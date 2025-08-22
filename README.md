@@ -216,6 +216,7 @@ async function handleKakaoLogin() {
 - 🔐 **인증 시스템**: Supabase Auth 기반 사용자 인증 (카카오, Google 지원)
 - 🎯 **인터랙티브 온보딩**: 스와이프 가능한 온보딩 화면
 - 💾 **로컬 스토리지**: MMKV 기반 고성능 키-값 스토리지
+- 🌍 **국제화(i18n)**: react-i18next 기반 다국어 지원 및 타입 안전성
 - 🎨 **NativeWind**: Tailwind CSS 기반 스타일링
 - 🚀 **React Native Reanimated**: 부드러운 애니메이션
 - 📱 **Expo Router**: 파일 기반 네비게이션
@@ -309,7 +310,7 @@ npm run android:cc:stats # Android 캐시 통계만 확인
 │   │   ├── +not-found.tsx        # 404 페이지
 │   │   ├── (app)/                # 메인 앱 화면들
 │   │   │   ├── _layout.tsx       # 앱 레이아웃
-│   │   │   └── index.tsx         # 홈 화면
+│   │   │   └── index.tsx         # 홈 화면 (언어 변경 UI 포함)
 │   │   └── (auth)/               # 인증 관련 화면들
 │   │       ├── _layout.tsx       # 인증 레이아웃
 │   │       └── index.tsx         # 로그인/회원가입 화면
@@ -325,6 +326,14 @@ npm run android:cc:stats # Android 캐시 통계만 확인
 │   ├── helpers/                  # 유틸리티 함수들
 │   │   ├── crashlytics.ts        # Firebase Crashlytics 헬퍼
 │   │   ├── storage.ts            # MMKV 스토리지 헬퍼
+│   │   ├── i18n/                 # 국제화(i18n) 모듈
+│   │   │   ├── config.ts         # i18next 설정 및 초기화
+│   │   │   ├── @types/           # 타입 안전성 지원
+│   │   │   │   └── i18next.d.ts  # i18next 타입 확장
+│   │   │   └── locales/          # 언어별 번역 파일
+│   │   │       ├── ko.json       # 한국어 번역
+│   │   │       ├── en.json       # 영어 번역
+│   │   │       └── ar.json       # 아랍어 번역
 │   │   └── supabase/             # Supabase 관련 모듈들
 │   │       ├── client.ts         # Supabase 클라이언트 생성 및 설정
 │   │       ├── env.ts            # 환경 변수 스키마 및 검증
@@ -899,6 +908,147 @@ CrashlyticsHelper.log("Payment process started");
 - [Firebase Crashlytics 가이드](https://firebase.google.com/docs/crashlytics)
 
 
+### 🌍 국제화(i18n) 시스템
+
+이 프로젝트는 [react-i18next](https://react.i18next.com/)를 사용하여 다국어 지원과 타입 안전성을 제공합니다.
+
+#### 지원 언어
+- 🇰🇷 **한국어** (ko) - 기본 언어
+- 🇺🇸 **영어** (en)
+- 🇸🇦 **아랍어** (ar) - RTL 지원
+
+#### 기본 사용법
+
+**useTranslation 훅 사용:**
+```typescript
+import { useTranslation } from "react-i18next";
+
+function MyComponent() {
+  const { t } = useTranslation();
+  
+  return (
+    <View>
+      <Text>{t("home.title")}</Text>
+      <Text>{t("auth.welcomeMessage")}</Text>
+    </View>
+  );
+}
+```
+
+**언어 변경:**
+```typescript
+import { changeLanguage } from "@/helpers/i18n/config";
+
+// 언어 변경
+changeLanguage("en"); // 영어로 변경
+changeLanguage("ar"); // 아랍어로 변경
+changeLanguage("ko"); // 한국어로 변경
+```
+
+**현재 언어 확인:**
+```typescript
+import { getCurrentLanguage } from "@/helpers/i18n/config";
+
+const currentLang = getCurrentLanguage();
+console.log("현재 언어:", currentLang); // "ko", "en", "ar"
+```
+
+#### 타입 안전성
+
+이 프로젝트는 완전한 타입 안전성을 지원합니다:
+
+```typescript
+// ✅ 존재하는 키 - 자동완성 지원
+t("home.title")
+t("auth.socialLogin.kakao")
+t("errors.logoutFailed")
+
+// ❌ 존재하지 않는 키 - 컴파일 에러 발생
+t("nonexistent.key") // TypeScript 에러!
+```
+
+#### 설정 파일 구조
+
+```
+src/helpers/i18n/
+├── config.ts              # i18next 설정 및 초기화
+├── @types/
+│   └── i18next.d.ts       # 타입 안전성 설정
+└── locales/
+    ├── ko.json            # 한국어 번역
+    ├── en.json            # 영어 번역
+    └── ar.json            # 아랍어 번역
+```
+
+#### 새로운 언어 추가하기
+
+1. **번역 파일 생성**: `src/helpers/i18n/locales/` 에 새 언어 파일 추가
+   ```json
+   // fr.json (프랑스어 예시)
+   {
+     "common": {
+       "welcome": "Bienvenue! 👋"
+     }
+   }
+   ```
+
+2. **config.ts 수정**: 새 언어를 resources에 추가
+   ```typescript
+   import translationsFr from "./locales/fr.json";
+   
+   export const resources = {
+     ko: { [defaultNS]: translationsKo },
+     en: { [defaultNS]: translationsEn },
+     ar: { [defaultNS]: translationsAr },
+     fr: { [defaultNS]: translationsFr }, // 새 언어 추가
+   } as const;
+   ```
+
+3. **app.json 업데이트**: locales 속성에 새 언어 추가
+   ```json
+   {
+     "expo": {
+       "locales": {
+         "ko": "./src/helpers/i18n/locales/ko.json",
+         "en": "./src/helpers/i18n/locales/en.json",
+         "ar": "./src/helpers/i18n/locales/ar.json",
+         "fr": "./src/helpers/i18n/locales/fr.json"
+       }
+     }
+   }
+   ```
+
+#### 중요한 설정 사항
+
+**app.json 필수 설정:**
+```json
+{
+  "expo": {
+    "ios": {
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true
+      }
+    },
+    "extra": {
+      "supportsRTL": true
+    },
+    "locales": {
+      "en": "./src/helpers/i18n/locales/en.json",
+      "ko": "./src/helpers/i18n/locales/ko.json", 
+      "ar": "./src/helpers/i18n/locales/ar.json"
+    }
+  }
+}
+```
+
+- **CFBundleAllowMixedLocalizations**: iOS 다국어 지원 필수
+- **supportsRTL**: 아랍어 등 RTL 언어 지원 (이미 설정됨)
+- **locales**: 각 언어별 번역 파일 경로 지정
+
+#### 참고 자료
+- [react-i18next 공식 문서](https://react.i18next.com/)
+- [i18next 공식 문서](https://www.i18next.com/)
+
 ### 🎨 스타일링
 
 #### NativeWind 설정
@@ -1098,7 +1248,6 @@ npm run build:plugin
 
 이 보일러플레이트는 지속적으로 발전하고 있습니다. 다음 기능들이 추가될 예정입니다:
 
-- 🌍 **다국어 지원**: i18next 기반 국제화
 - 📱 **푸시 알림**: Firebase Cloud Messaging
 - 💰 **인앱 결제**: RevenueCat 연동
 - 🎯 **분석**: Firebase Analytics
@@ -1114,6 +1263,8 @@ npm run build:plugin
 - **MMKV**: 고성능 키-값 스토리지
 - **NativeWind 4**: Tailwind CSS for React Native
 - **TypeScript**: 타입 안전성
+- **react-i18next**: 다국어 지원 및 타입 안전 번역
+- **i18next**: 국제화 프레임워크
 - **Supabase**: 백엔드 서비스 (인증, 데이터베이스)
 - **Firebase**: Crashlytics, Analytics 등
 
@@ -1121,6 +1272,8 @@ npm run build:plugin
 
 - [Expo 53 문서](https://docs.expo.dev/)
 - [Supabase 문서](https://supabase.com/docs)
+- [react-i18next 문서](https://react.i18next.com/)
+- [i18next 문서](https://www.i18next.com/)
 - [Kakao Developers](https://developers.kakao.com/)
 - [React Native 새 아키텍처](https://reactnative.dev/docs/the-new-architecture/landing-page)
 - [NativeWind 문서](https://www.nativewind.dev/)

@@ -1,0 +1,63 @@
+{
+	"common": {
+		"welcome": "환영합니다! 👋",
+		"logout": "로그아웃",
+		"usefulLinks": "유용한 링크",
+		"selectLanguage": "언어 선택"
+	},
+	"home": {
+		"title": "React Native Expo 🚀",
+		"subtitle": "빠르게 앱을 제작하기 위한 Expo Start Kit",
+		"account": "계정",
+		"logoutDescription": "계정에서 안전하게 로그아웃",
+		"coreFeatures": "핵심 기능",
+		"features": {
+			"authentication": {
+				"title": "인증 시스템",
+				"description": "Supabase + 카카오/Google/Facebook"
+			},
+			"onboarding": {
+				"title": "온보딩",
+				"description": "스와이프 인터랙션"
+			},
+			"storage": {
+				"title": "로컬 스토리지",
+				"description": "MMKV 고성능"
+			},
+			"styling": {
+				"title": "스타일링",
+				"description": "NativeWind (TailwindCSS)"
+			},
+			"animation": {
+				"title": "애니메이션",
+				"description": "React Native Reanimated"
+			},
+			"errorTracking": {
+				"title": "에러 추적",
+				"description": "Firebase Crashlytics"
+			}
+		},
+		"links": {
+			"expo": "Expo 53 문서",
+			"supabase": "Supabase 가이드",
+			"nativewind": "NativeWind 문서",
+			"reanimated": "Reanimated 3",
+			"kakao": "Kakao Developers"
+		}
+	},
+	"auth": {
+		"welcomeMessage": "환영합니다! 👋",
+		"loginPrompt": "계속하려면 로그인해주세요",
+		"socialLogin": {
+			"kakao": "카카오톡으로 계속하기",
+			"google": "구글 계정으로 계속하기",
+			"facebook": "페이스북으로 계속하기"
+		}
+	},
+	"errors": {
+		"linkOpenFailed": "링크 열기 실패:",
+		"logoutFailed": "로그아웃 실패:",
+		"logoutError": "로그아웃 중 오류:",
+		"logoutSuccess": "로그아웃 성공"
+	}
+}

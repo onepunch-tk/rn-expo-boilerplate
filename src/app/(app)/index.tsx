@@ -2,17 +2,43 @@ import { Feather } from "@expo/vector-icons";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useAppContext } from "@/context/AppContext";
+import { changeLanguage, getCurrentLanguage } from "@/helpers/i18n/config";
 import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaeAuthHelper";
 
+// 지원 언어 목록
+const SUPPORTED_LANGUAGES = [
+	{ code: "ko", name: "한국어", flag: "🇰🇷" },
+	{ code: "en", name: "English", flag: "🇺🇸" },
+	{ code: "ar", name: "العربية", flag: "🇸🇦" },
+];
+
 export default function HomePage() {
+	const { t } = useTranslation();
 	const { colorScheme, setColorScheme } = useAppContext();
+	const [isLanguageModalVisible, setIsLanguageModalVisible] = useState(false);
 
 	function toggleColorScheme() {
 		setColorScheme(colorScheme === "dark" ? "light" : "dark");
 	}
 
+	// 언어 변경 핸들러
+	function handleLanguageChange(langCode: string) {
+		changeLanguage(langCode);
+		setIsLanguageModalVisible(false);
+	}
+
+	// 현재 언어 정보 가져오기
+	function getCurrentLanguageInfo() {
+		const currentLang = getCurrentLanguage();
+		return (
+			SUPPORTED_LANGUAGES.find((lang) => lang.code === currentLang) ||
+			SUPPORTED_LANGUAGES[0]
+		);
+	}
 	// 유용한 링크 URL들
 	const documentationLinks = {
 		expo: "https://docs.expo.dev/",
@@ -27,7 +53,7 @@ export default function HomePage() {
 		try {
 			await WebBrowser.openBrowserAsync(url);
 		} catch (error) {
-			console.error("링크 열기 실패:", error);
+			console.error(error);
 		}
 	}
 
@@ -36,13 +62,13 @@ export default function HomePage() {
 		try {
 			const { error } = await SupabaseAuthHelper.signOut();
 			if (error) {
-				console.error("로그아웃 실패:", error.message);
+				console.error(t("errors.logoutFailed"), error.message);
 				// TODO: 사용자에게 에러 메시지 표시
 			} else {
-				console.log("로그아웃 성공");
+				console.log(t("errors.logoutSuccess"));
 			}
 		} catch (error) {
-			console.error("로그아웃 중 오류:", error);
+			console.error(t("errors.logoutError"), error);
 		}
 	}
 
@@ -51,20 +77,46 @@ export default function HomePage() {
 			<Stack.Screen
 				options={{
 					headerBackVisible: false,
-					title: "Welcome",
+					title: t("common.welcome"),
 					headerStyle: {
 						backgroundColor: colorScheme === "dark" ? "#111827" : "#fff",
 					},
 					headerTintColor: colorScheme === "dark" ? "#fff" : "#000",
-					headerRight: () => (
-						<TouchableOpacity onPress={toggleColorScheme} className="mr-4 p-2">
-							<Feather
-								name={colorScheme === "dark" ? "sun" : "moon"}
-								size={20}
-								color={colorScheme === "dark" ? "#fbbf24" : "#6b7280"}
-							/>
-						</TouchableOpacity>
-					),
+					headerRight: () => {
+						const currentLangInfo = getCurrentLanguageInfo();
+						return (
+							<View className="flex-row items-center">
+								{/* 언어 변경 버튼 */}
+								<TouchableOpacity
+									onPress={() => setIsLanguageModalVisible(true)}
+									className="mr-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg flex-row items-center"
+								>
+									<Text className="text-sm mr-1">{currentLangInfo.flag}</Text>
+									<Text className="text-xs font-semibold text-gray-700 dark:text-gray-200">
+										{currentLangInfo.code.toUpperCase()}
+									</Text>
+									<Feather
+										name="chevron-down"
+										size={12}
+										color={colorScheme === "dark" ? "#d1d5db" : "#374151"}
+										style={{ marginLeft: 2 }}
+									/>
+								</TouchableOpacity>
+
+								{/* 컬러 스킴 변경 버튼 */}
+								<TouchableOpacity
+									onPress={toggleColorScheme}
+									className="mr-4 p-2"
+								>
+									<Feather
+										name={colorScheme === "dark" ? "sun" : "moon"}
+										size={20}
+										color={colorScheme === "dark" ? "#fbbf24" : "#6b7280"}
+									/>
+								</TouchableOpacity>
+							</View>
+						);
+					},
 				}}
 			/>
 			<ScrollView className="flex-1 bg-white dark:bg-gray-900">
@@ -72,17 +124,17 @@ export default function HomePage() {
 					{/* Welcome Section */}
 					<View className="mb-8">
 						<Text className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-							React Native Expo 🚀
+							{t("home.title")}
 						</Text>
 						<Text className="text-lg text-gray-600 dark:text-gray-300">
-							빠른 시작을 위한 Expo Start Kit
+							{t("home.subtitle")}
 						</Text>
 					</View>
 
 					{/* Account Section */}
 					<View className="mb-8">
 						<Text className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-							계정
+							{t("home.account")}
 						</Text>
 
 						<TouchableOpacity
@@ -94,10 +146,10 @@ export default function HomePage() {
 							</View>
 							<View className="flex-1">
 								<Text className="font-semibold text-red-900 dark:text-red-100">
-									로그아웃
+									{t("common.logout")}
 								</Text>
 								<Text className="text-sm text-red-700 dark:text-red-200">
-									계정에서 안전하게 로그아웃
+									{t("home.logoutDescription")}
 								</Text>
 							</View>
 						</TouchableOpacity>
@@ -106,7 +158,7 @@ export default function HomePage() {
 					{/* Core Features */}
 					<View className="mb-8">
 						<Text className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-							핵심 기능
+							{t("home.coreFeatures")}
 						</Text>
 
 						<View className="space-y-3 gap-y-1">
@@ -117,10 +169,10 @@ export default function HomePage() {
 								</View>
 								<View className="flex-1">
 									<Text className="font-semibold text-gray-900 dark:text-white">
-										인증 시스템
+										{t("home.features.authentication.title")}
 									</Text>
 									<Text className="text-sm text-gray-600 dark:text-gray-400">
-										Supabase + 카카오/Google
+										{t("home.features.authentication.description")}
 									</Text>
 								</View>
 							</View>
@@ -132,10 +184,10 @@ export default function HomePage() {
 								</View>
 								<View className="flex-1">
 									<Text className="font-semibold text-gray-900 dark:text-white">
-										온보딩
+										{t("home.features.onboarding.title")}
 									</Text>
 									<Text className="text-sm text-gray-600 dark:text-gray-400">
-										스와이프 인터랙션
+										{t("home.features.onboarding.description")}
 									</Text>
 								</View>
 							</View>
@@ -150,10 +202,10 @@ export default function HomePage() {
 								</View>
 								<View className="flex-1">
 									<Text className="font-semibold text-gray-900 dark:text-white">
-										로컬 스토리지
+										{t("home.features.storage.title")}
 									</Text>
 									<Text className="text-sm text-gray-600 dark:text-gray-400">
-										MMKV 고성능
+										{t("home.features.storage.description")}
 									</Text>
 								</View>
 							</View>
@@ -165,10 +217,10 @@ export default function HomePage() {
 								</View>
 								<View className="flex-1">
 									<Text className="font-semibold text-gray-900 dark:text-white">
-										스타일링
+										{t("home.features.styling.title")}
 									</Text>
 									<Text className="text-sm text-gray-600 dark:text-gray-400">
-										NativeWind (TailwindCSS)
+										{t("home.features.styling.description")}
 									</Text>
 								</View>
 							</View>
@@ -180,10 +232,10 @@ export default function HomePage() {
 								</View>
 								<View className="flex-1">
 									<Text className="font-semibold text-gray-900 dark:text-white">
-										애니메이션
+										{t("home.features.animation.title")}
 									</Text>
 									<Text className="text-sm text-gray-600 dark:text-gray-400">
-										React Native Reanimated
+										{t("home.features.animation.description")}
 									</Text>
 								</View>
 							</View>
@@ -198,10 +250,10 @@ export default function HomePage() {
 								</View>
 								<View className="flex-1">
 									<Text className="font-semibold text-gray-900 dark:text-white">
-										에러 추적
+										{t("home.features.errorTracking.title")}
 									</Text>
 									<Text className="text-sm text-gray-600 dark:text-gray-400">
-										Firebase Crashlytics
+										{t("home.features.errorTracking.description")}
 									</Text>
 								</View>
 							</View>
@@ -213,7 +265,7 @@ export default function HomePage() {
 						<View className="flex-row items-center mb-4">
 							<Feather className="text-gray-500 text-xl" name="link" />
 							<Text className="text-lg font-bold text-gray-900 dark:text-white ml-3">
-								유용한 링크
+								{t("common.usefulLinks")}
 							</Text>
 						</View>
 
@@ -225,7 +277,7 @@ export default function HomePage() {
 								<View className="flex-row items-center">
 									<Feather className="text-blue-500 text-lg" name="book" />
 									<Text className="text-sm font-medium text-gray-800 dark:text-gray-200 ml-3">
-										Expo 53 문서
+										{t("home.links.expo")}
 									</Text>
 								</View>
 								<Feather name="external-link" size={14} color="#9ca3af" />
@@ -238,7 +290,7 @@ export default function HomePage() {
 								<View className="flex-row items-center">
 									<Feather className="text-green-500 text-lg" name="database" />
 									<Text className="text-sm font-medium text-gray-800 dark:text-gray-200 ml-3">
-										Supabase 가이드
+										{t("home.links.supabase")}
 									</Text>
 								</View>
 								<Feather name="external-link" size={14} color="#9ca3af" />
@@ -251,7 +303,7 @@ export default function HomePage() {
 								<View className="flex-row items-center">
 									<Feather className="text-orange-500 text-lg" name="layout" />
 									<Text className="text-sm font-medium text-gray-800 dark:text-gray-200 ml-3">
-										NativeWind 문서
+										{t("home.links.nativewind")}
 									</Text>
 								</View>
 								<Feather name="external-link" size={14} color="#9ca3af" />
@@ -264,7 +316,7 @@ export default function HomePage() {
 								<View className="flex-row items-center">
 									<Feather className="text-pink-500 text-lg" name="zap" />
 									<Text className="text-sm font-medium text-gray-800 dark:text-gray-200 ml-3">
-										Reanimated 3
+										{t("home.links.reanimated")}
 									</Text>
 								</View>
 								<Feather name="external-link" size={14} color="#9ca3af" />
@@ -280,7 +332,7 @@ export default function HomePage() {
 										name="message-circle"
 									/>
 									<Text className="text-sm font-medium text-gray-800 dark:text-gray-200 ml-3">
-										Kakao Developers
+										{t("home.links.kakao")}
 									</Text>
 								</View>
 								<Feather name="external-link" size={14} color="#9ca3af" />
@@ -289,6 +341,58 @@ export default function HomePage() {
 					</View>
 				</View>
 			</ScrollView>
+
+			{/* 언어 선택 모달 */}
+			<Modal
+				animationType="fade"
+				transparent={true}
+				visible={isLanguageModalVisible}
+				onRequestClose={() => setIsLanguageModalVisible(false)}
+			>
+				<TouchableOpacity
+					className="flex-1 bg-black/50 justify-center items-center"
+					activeOpacity={1}
+					onPress={() => setIsLanguageModalVisible(false)}
+				>
+					<View className="bg-white dark:bg-gray-800 rounded-xl mx-8 py-4 shadow-lg">
+						<Text className="text-lg font-bold text-gray-900 dark:text-white text-center mb-4 px-6">
+							{t("common.selectLanguage") || "언어 선택"}
+						</Text>
+
+						{SUPPORTED_LANGUAGES.map((language) => {
+							const isSelected = getCurrentLanguage() === language.code;
+							return (
+								<TouchableOpacity
+									key={language.code}
+									onPress={() => handleLanguageChange(language.code)}
+									className={`flex-row items-center px-6 py-3 ${
+										isSelected ? "bg-blue-50 dark:bg-blue-900/20" : ""
+									}`}
+								>
+									<Text className="text-2xl mr-3">{language.flag}</Text>
+									<Text
+										className={`flex-1 text-base ${
+											isSelected
+												? "font-semibold text-blue-600 dark:text-blue-400"
+												: "text-gray-700 dark:text-gray-200"
+										}`}
+									>
+										{language.name}
+									</Text>
+									{isSelected && (
+										<Feather
+											name="check"
+											size={20}
+											color={colorScheme === "dark" ? "#60a5fa" : "#2563eb"}
+										/>
+									)}
+								</TouchableOpacity>
+							);
+						})}
+					</View>
+				</TouchableOpacity>
+			</Modal>
+
 			<StatusBar
 				style={
 					colorScheme === "system"

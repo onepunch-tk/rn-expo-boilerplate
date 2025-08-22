@@ -1103,8 +1103,6 @@ npm run build:plugin
 - 💰 **인앱 결제**: RevenueCat 연동
 - 🎯 **분석**: Firebase Analytics
 - 📋 **폼 관리**: React Hook Form
-- 🎭 **아이콘**: Expo Vector Icons
-- 🔒 **소셜 로그인**: Google, Apple, GitHub 등
 
 ## 🧰 사용된 주요 라이브러리
 

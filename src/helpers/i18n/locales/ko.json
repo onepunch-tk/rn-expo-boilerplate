@@ -14,7 +14,7 @@
 		"features": {
 			"authentication": {
 				"title": "인증 시스템",
-				"description": "Supabase + 카카오/Google/Facebook"
+				"description": "Supabase + 카카오/Google"
 			},
 			"onboarding": {
 				"title": "온보딩",
@@ -50,8 +50,7 @@
 		"loginPrompt": "계속하려면 로그인해주세요",
 		"socialLogin": {
 			"kakao": "카카오톡으로 계속하기",
-			"google": "구글 계정으로 계속하기",
-			"facebook": "페이스북으로 계속하기"
+			"google": "구글 계정으로 계속하기"
 		}
 	},
 	"errors": {

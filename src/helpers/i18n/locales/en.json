@@ -14,7 +14,7 @@
 		"features": {
 			"authentication": {
 				"title": "Authentication System",
-				"description": "Supabase + Kakao/Google/Facebook"
+				"description": "Supabase + Kakao/Google"
 			},
 			"onboarding": {
 				"title": "Onboarding",
@@ -50,8 +50,7 @@
 		"loginPrompt": "Please login to continue",
 		"socialLogin": {
 			"kakao": "Sign in with KakaoTalk",
-			"google": "Sign in with Google",
-			"facebook": "Sign in with Facebook"
+			"google": "Sign in with Google"
 		}
 	},
 	"errors": {

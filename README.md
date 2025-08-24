@@ -435,7 +435,7 @@ const { isLoading, hasSeenOnboarding } = useOnboarding();
 
 - **`client.ts`**: Supabase 클라이언트 생성 및 MMKV 스토리지 연동
 - **`env.ts`**: 환경 변수 스키마 정의 및 검증 (zod 사용)
-- **`SupabaseAuthHelper.ts`**: 인증 관련 헬퍼 함수들 (Google, Kakao, Facebook 로그인)
+- **`SupabaseAuthHelper.ts`**: 인증 관련 헬퍼 함수들 (Google, Kakao)
 - **`types.ts`**: 공통 타입 정의 (Result, AuthResponse 등)
 - **`utils.ts`**: 유틸리티 함수들 (createAuthResult 등)
 

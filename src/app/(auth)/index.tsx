@@ -5,7 +5,6 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAppContext } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
 import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaeAuthHelper";
-import FacebookLogo from "~/assets/images/brand-logo/facebook.svg";
 import GoogleLogo from "~/assets/images/brand-logo/google.svg";
 import KakaoTalkLogo from "~/assets/images/brand-logo/kakaotalk.svg";
 

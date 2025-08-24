@@ -4,7 +4,7 @@ import { Feather } from "@expo/vector-icons";
 import { Stack } from "expo-router";
 import { cssInterop } from "nativewind";
 import { useEffect } from "react";
-import { Platform } from "react-native";
+import { Linking, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -20,7 +20,6 @@ export default function RootLayout() {
 		// biome-ignore lint/correctness/useHookAtTopLevel: dev mode only
 		useMMKVDevTools({ storage: storage });
 	}
-
 	// 앱 시작 시 Crashlytics 초기화
 	useEffect(() => {
 		async function initCrashlytics() {

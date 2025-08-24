@@ -5,6 +5,8 @@ import {
 	type Session,
 	type User,
 } from "@supabase/supabase-js";
+import { makeRedirectUri } from "expo-auth-session";
+import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";
 import { AUTH_PROVIDERS } from "@/constants/auth";
 import KakaoCoreModule from "~/modules/kakao-core/";
@@ -14,6 +16,7 @@ import type { Result, SignOutResponse } from "./types";
 import { createAuthResult } from "./utils";
 
 WebBrowser.maybeCompleteAuthSession();
+const redirectTo = makeRedirectUri();
 
 export const SupabaseAuthHelper = {
 	onAuthStateChange(
@@ -111,6 +114,50 @@ export const SupabaseAuthHelper = {
 						);
 
 			return createAuthResult(null, authError);
+		}
+	},
+	async signInWithFacebook() {
+		try {
+			const { data, error } = await supabase.auth.signInWithOAuth({
+				provider: "facebook",
+				options: {
+					redirectTo,
+				},
+			});
+
+			if (error) {
+				return createAuthResult(null, error);
+			}
+
+			if (data?.url) {
+				const res = await WebBrowser.openAuthSessionAsync(data.url);
+				if (res.type === "success") {
+					const { url } = res;
+					const { params, errorCode } = QueryParams.getQueryParams(url);
+					if (errorCode) {
+						return createAuthResult(null, new AuthError(errorCode));
+					}
+
+					const { access_token, refresh_token } = params;
+					const { data, error } = await supabase.auth.setSession({
+						access_token,
+						refresh_token,
+					});
+
+					if (error) {
+						return createAuthResult(null, error);
+					}
+
+					return createAuthResult(data, null);
+				} else {
+					return createAuthResult(
+						null,
+						new AuthError("Facebook 로그인에 실패했습니다"),
+					);
+				}
+			}
+		} catch (error) {
+			return createAuthResult(null, new AuthError(error as string));
 		}
 	},
 	async signOut(): Promise<SignOutResponse> {

@@ -14,7 +14,7 @@
 		"features": {
 			"authentication": {
 				"title": "نظام المصادقة",
-				"description": "Supabase + كاكاو/جوجل"
+				"description": "Supabase + كاكاو/جوجل/فيسبوك"
 			},
 			"onboarding": {
 				"title": "التعريف بالتطبيق",
@@ -50,7 +50,8 @@
 		"loginPrompt": "يرجى تسجيل الدخول للمتابعة",
 		"socialLogin": {
 			"kakao": "المتابعة مع KakaoTalk",
-			"google": "المتابعة مع حساب جوجل"
+			"google": "المتابعة مع حساب جوجل",
+			"facebook": "المتابعة مع فيسبوك"
 		}
 	},
 	"errors": {

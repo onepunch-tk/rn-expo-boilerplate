@@ -104,13 +104,62 @@ Firebase는 OAuth 인증과 Crashlytics 서비스 두 가지 목적으로 사용
 6. 앱 키 확인:
    - Native 앱 키 (SDK 초기화용)
 
-### 5. Supabase Authentication Provider 설정
+### 5. Facebook 개발자 콘솔 설정
 
-**Supabase에서 카카오 인증 설정:**
+**Facebook 로그인 기능을 사용하려면 다음 단계를 따르세요:**
+
+1. **Facebook 앱 생성**
+   - [Facebook for Developers](https://developers.facebook.com/)에서 로그인
+   - **My Apps** → **Create App** 클릭
+   - 앱 유형 선택 후 앱 정보 입력
+
+2. **Facebook 로그인 설정**
+   - **Add Products to Your App**에서 **Facebook Login** → **Setup** 클릭
+   - 좌측 메뉴에서 **Facebook Login** → **Settings** 이동
+   - **Valid OAuth Redirect URIs**에 다음 URL 추가:
+     ```
+     https://<your-project-id>.supabase.co/auth/v1/callback
+     ```
+
+3. **권한 설정**
+   - **Use Cases** → **Authentication and Account Creation** → **Edit** 클릭
+   - `public_profile`과 `email` 권한이 **Ready for testing** 상태인지 확인
+
+4. **앱 정보 확인**
+   - **Settings** → **Basic**에서 **App ID**와 **App Secret** 복사
+   - **App Secret**은 **Show** 버튼을 클릭하여 확인
+
+> 📖 **자세한 설정 방법**: [Supabase Facebook OAuth 공식 문서](https://supabase.com/docs/guides/auth/social-login/auth-facebook) 참고
+
+### 6. Supabase Authentication Provider 설정
+
+#### Supabase URL Configuration 설정 (중요!)
+
+**⚠️ Facebook OAuth가 정상 작동하려면 반드시 다음 설정을 해야 합니다:**
+
+1. [Supabase Dashboard](https://supabase.com/dashboard) > **Authentication** > **URL Configuration**로 이동
+
+2. **Site URL** 설정:
+   ```
+   your-app-scheme://
+   ```
+   - `your-app-scheme`을 실제 앱의 scheme으로 변경하세요
+   - 예: `rnexpoboilerplate://` (이 프로젝트의 경우)
+   - **주의**: URL 끝에 반드시 `://`를 포함해야 합니다
+
+#### Provider 설정
+
+**Supabase에서 Facebook/카카오 인증 설정:**
 
 1. [Supabase Dashboard](https://supabase.com/dashboard) > Authentication > Providers로 이동
-2. Kakao provider 활성화
-3. 카카오 개발자 콘솔에서 얻은 정보 입력:
+
+2. **Facebook provider 활성화**:
+   - Facebook 개발자 콘솔에서 얻은 정보 입력:
+   - **Client ID**: Facebook 앱 ID
+   - **Client Secret**: Facebook 앱 시크릿
+
+3. **Kakao provider 활성화**:
+   - 카카오 개발자 콘솔에서 얻은 정보 입력:
    - **Client ID**: Native 앱 키
    - **Client Secret**: 보안 탭에서 생성한 Client Secret
 
@@ -565,6 +614,29 @@ function LoginScreen() {
     </View>
   );
 }
+```
+
+##### Facebook 로그인 사용법
+**⚠️ 중요**: Facebook 로그인을 사용하기 전에 반드시 위의 Facebook 개발자 콘솔 설정과 Supabase URL Configuration 설정을 완료해야 합니다.
+
+```typescript
+import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaseAuthHelper";
+
+const handleFacebookSignIn = async () => {
+  try {
+    const { success, error, data } = await SupabaseAuthHelper.signInWithFacebook();
+    
+    if (success) {
+      console.log('Facebook 로그인 성공:', data.user?.email);
+      // 로그인 성공 후 처리
+    } else {
+      console.error('Facebook 로그인 실패:', error.message);
+      // 에러 처리
+    }
+  } catch (error) {
+    console.error('Facebook 로그인 에러:', error);
+  }
+};
 ```
 
 ##### 로그아웃

@@ -5,6 +5,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAppContext } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
 import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaeAuthHelper";
+import FacebookLogo from "~/assets/images/brand-logo/facebook.svg";
 import GoogleLogo from "~/assets/images/brand-logo/google.svg";
 import KakaoTalkLogo from "~/assets/images/brand-logo/kakaotalk.svg";
 
@@ -13,7 +14,7 @@ export default function Page() {
 	const { setIsAuthLoading, isAuthLoading } = useAuth();
 	const { colorScheme } = useAppContext();
 
-	async function handleSocialSignin(provider: "kakao" | "google") {
+	async function handleSocialSignin(provider: "kakao" | "google" | "facebook") {
 		setIsAuthLoading(true);
 		switch (provider) {
 			case "kakao":
@@ -21,6 +22,9 @@ export default function Page() {
 				break;
 			case "google":
 				await SupabaseAuthHelper.signInWithGoogle();
+				break;
+			case "facebook":
+				await SupabaseAuthHelper.signInWithFacebook();
 				break;
 		}
 	}
@@ -73,6 +77,23 @@ export default function Page() {
 								<View className="flex-1 justify-center items-center">
 									<Text className="text-black dark:text-white font-semibold text-lg">
 										{t("auth.socialLogin.google")}
+									</Text>
+								</View>
+							</TouchableOpacity>
+						</View>
+
+						{/* Facebook Login */}
+						<View className="w-full bg-[#0866FF] px-2 py-1 rounded-2xl border-2 border-[#0866FF]">
+							<TouchableOpacity
+								className="flex-row"
+								onPress={() => handleSocialSignin("facebook")}
+							>
+								<View className="bg-[#0866FF] rounded-full p-1 justify-center items-center w-[50px] h-[50px]">
+									<FacebookLogo fill={"white"} width={40} height={40} />
+								</View>
+								<View className="flex-1 justify-center items-center">
+									<Text className="text-white font-semibold text-lg">
+										{t("auth.socialLogin.facebook")}
 									</Text>
 								</View>
 							</TouchableOpacity>

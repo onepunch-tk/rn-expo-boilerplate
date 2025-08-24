@@ -14,7 +14,7 @@ export default function Page() {
 	const { setIsAuthLoading, isAuthLoading } = useAuth();
 	const { colorScheme } = useAppContext();
 
-	async function handleSocialSignin(provider: "kakao" | "google" | "facebook") {
+	async function handleSocialSignin(provider: "kakao" | "google") {
 		setIsAuthLoading(true);
 		switch (provider) {
 			case "kakao":
@@ -22,9 +22,6 @@ export default function Page() {
 				break;
 			case "google":
 				await SupabaseAuthHelper.signInWithGoogle();
-				break;
-			case "facebook":
-				await SupabaseAuthHelper.signInWithFacebook();
 				break;
 		}
 	}
@@ -77,23 +74,6 @@ export default function Page() {
 								<View className="flex-1 justify-center items-center">
 									<Text className="text-black dark:text-white font-semibold text-lg">
 										{t("auth.socialLogin.google")}
-									</Text>
-								</View>
-							</TouchableOpacity>
-						</View>
-
-						{/* Facebook Login */}
-						<View className="w-full bg-[#0866FF] px-2 py-1 rounded-2xl border-2 border-[#1877F2]">
-							<TouchableOpacity
-								className="flex-row"
-								onPress={() => handleSocialSignin("facebook")}
-							>
-								<View className="items-center rounded-full p-1 justify-center w-[50px] h-[50px]">
-									<FacebookLogo fill="white" width={45} height={45} />
-								</View>
-								<View className="flex-1 justify-center items-center">
-									<Text className="text-white font-semibold text-lg">
-										{t("auth.socialLogin.facebook")}
 									</Text>
 								</View>
 							</TouchableOpacity>

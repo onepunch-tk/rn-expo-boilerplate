@@ -4,12 +4,14 @@ import { Feather } from "@expo/vector-icons";
 import { Stack } from "expo-router";
 import { cssInterop } from "nativewind";
 import { useEffect } from "react";
+import { Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { CrashlyticsHelper } from "@/helpers/crashlytics";
 import { storage } from "@/helpers/storage";
 import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaeAuthHelper";
+import KakaoCoreModule from "~/modules/kakao-core";
 
 cssInterop(Feather, { className: { target: "style" } });
 
@@ -37,6 +39,10 @@ export default function RootLayout() {
 	useEffect(() => {
 		SupabaseAuthHelper.initializeKakaoSDK();
 		SupabaseAuthHelper.configureGoogleSignIn();
+		if (Platform.OS === "android") {
+			const keyHash = KakaoCoreModule.getKeyHash();
+			console.log("keyHash: ", keyHash);
+		}
 	}, []);
 
 	return (

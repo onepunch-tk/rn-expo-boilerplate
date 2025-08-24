@@ -5,12 +5,15 @@ import {
 	type Session,
 	type User,
 } from "@supabase/supabase-js";
+import * as WebBrowser from "expo-web-browser";
 import { AUTH_PROVIDERS } from "@/constants/auth";
 import KakaoCoreModule from "~/modules/kakao-core/";
 import KakaoUserModule from "~/modules/kakao-user";
 import { supabase } from "./client";
 import type { Result, SignOutResponse } from "./types";
 import { createAuthResult } from "./utils";
+
+WebBrowser.maybeCompleteAuthSession();
 
 export const SupabaseAuthHelper = {
 	onAuthStateChange(
@@ -68,29 +71,6 @@ export const SupabaseAuthHelper = {
 							error instanceof Error
 								? error.message
 								: "Google 로그인 중 오류가 발생했습니다",
-						);
-
-			return createAuthResult(null, authError);
-		}
-	},
-	async signInWithFacebook(): Promise<
-		Result<{ user: User; session: Session }>
-	> {
-		try {
-			const { data, error } = await supabase.auth.signInWithIdToken({
-				provider: AUTH_PROVIDERS.FACEBOOK,
-				token: "", // TODO: Facebook 토큰 구현 필요
-			});
-
-			return createAuthResult(data, error);
-		} catch (error) {
-			const authError =
-				error instanceof AuthError
-					? error
-					: new AuthError(
-							error instanceof Error
-								? error.message
-								: "Facebook 로그인 중 오류가 발생했습니다",
 						);
 
 			return createAuthResult(null, authError);

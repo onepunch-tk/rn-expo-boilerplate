@@ -1,4 +1,5 @@
 import { AuthError, type Session, type User } from "@supabase/supabase-js";
+
 import type { Result } from "./types";
 
 /**

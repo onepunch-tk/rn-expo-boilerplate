@@ -371,7 +371,7 @@ export default function HomePage() {
 								>
 									<Text className="text-2xl mr-3">{language.flag}</Text>
 									<Text
-										className={`flex-1 text-base ${
+										className={`text-base ${
 											isSelected
 												? "font-semibold text-blue-600 dark:text-blue-400"
 												: "text-gray-700 dark:text-gray-200"

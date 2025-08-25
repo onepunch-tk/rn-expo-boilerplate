@@ -1,7 +1,7 @@
 import "~/global.css";
 import { useMMKVDevTools } from "@dev-plugins/react-native-mmkv";
 import { Feather } from "@expo/vector-icons";
-import { Stack, usePathname, useSegments } from "expo-router";
+import { Stack, useSegments } from "expo-router";
 import { cssInterop } from "nativewind";
 import { useEffect } from "react";
 import { Platform } from "react-native";

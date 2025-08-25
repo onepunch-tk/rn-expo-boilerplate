@@ -149,6 +149,7 @@ export const SupabaseAuthHelper = {
 			);
 		}
 	},
+	async signInWithApple() {},
 	async signOut(): Promise<SignOutResponse> {
 		const { error } = await supabase.auth.signOut();
 		return { error };

@@ -51,7 +51,8 @@
 		"socialLogin": {
 			"kakao": "المتابعة مع KakaoTalk",
 			"google": "المتابعة مع حساب جوجل",
-			"facebook": "المتابعة مع فيسبوك"
+			"facebook": "المتابعة مع فيسبوك",
+			"apple": "المتابعة مع Apple"
 		}
 	},
 	"errors": {

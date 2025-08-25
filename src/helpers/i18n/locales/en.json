@@ -51,7 +51,8 @@
 		"socialLogin": {
 			"kakao": "Sign in with KakaoTalk",
 			"google": "Sign in with Google",
-			"facebook": "Sign in with Facebook"
+			"facebook": "Sign in with Facebook",
+			"apple": "Sign in with Apple"
 		}
 	},
 	"errors": {

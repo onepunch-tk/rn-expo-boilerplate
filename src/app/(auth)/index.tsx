@@ -1,10 +1,12 @@
+import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { useTranslation } from "react-i18next";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Platform, Text, TouchableOpacity, View } from "react-native";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAppContext } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
 import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaeAuthHelper";
+import AppleLogo from "~/assets/images/brand-logo/apple.svg";
 import FacebookLogo from "~/assets/images/brand-logo/facebook.svg";
 import GoogleLogo from "~/assets/images/brand-logo/google.svg";
 import KakaoTalkLogo from "~/assets/images/brand-logo/kakaotalk.svg";
@@ -98,6 +100,22 @@ export default function Page() {
 								</View>
 							</TouchableOpacity>
 						</View>
+
+						{/* Apple Login */}
+						{Platform.OS === "ios" && (
+							<View className="w-full bg-black px-2 py-1 rounded-2xl border-2 border-[#000]">
+								<TouchableOpacity className="flex-row" onPress={() => {}}>
+									<View className="bg-black rounded-full p-1 justify-center items-center w-[50px] h-[50px]">
+										<AppleLogo fill={"white"} width={40} height={40} />
+									</View>
+									<View className="flex-1 justify-center items-center">
+										<Text className="text-white font-semibold text-lg">
+											{t("auth.socialLogin.apple")}
+										</Text>
+									</View>
+								</TouchableOpacity>
+							</View>
+						)}
 					</View>
 				</View>
 			</View>

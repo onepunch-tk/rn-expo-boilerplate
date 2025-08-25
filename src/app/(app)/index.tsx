@@ -5,20 +5,14 @@ import * as WebBrowser from "expo-web-browser";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { SUPPORTED_LANGUAGES } from "@/constants/app";
 import { useAppContext } from "@/context/AppContext";
-import { changeLanguage, getCurrentLanguage } from "@/helpers/i18n/config";
 import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaeAuthHelper";
-
-// 지원 언어 목록
-const SUPPORTED_LANGUAGES = [
-	{ code: "ko", name: "한국어", flag: "🇰🇷" },
-	{ code: "en", name: "English", flag: "🇺🇸" },
-	{ code: "ar", name: "العربية", flag: "🇸🇦" },
-];
 
 export default function HomePage() {
 	const { t } = useTranslation();
-	const { colorScheme, setColorScheme } = useAppContext();
+	const { colorScheme, setColorScheme, language, setLanguage } =
+		useAppContext();
 	const [isLanguageModalVisible, setIsLanguageModalVisible] = useState(false);
 
 	function toggleColorScheme() {
@@ -27,15 +21,14 @@ export default function HomePage() {
 
 	// 언어 변경 핸들러
 	function handleLanguageChange(langCode: string) {
-		changeLanguage(langCode);
+		setLanguage(langCode);
 		setIsLanguageModalVisible(false);
 	}
 
 	// 현재 언어 정보 가져오기
 	function getCurrentLanguageInfo() {
-		const currentLang = getCurrentLanguage();
 		return (
-			SUPPORTED_LANGUAGES.find((lang) => lang.code === currentLang) ||
+			SUPPORTED_LANGUAGES.find((lang) => lang.code === language) ||
 			SUPPORTED_LANGUAGES[0]
 		);
 	}
@@ -359,17 +352,17 @@ export default function HomePage() {
 							{t("common.selectLanguage") || "언어 선택"}
 						</Text>
 
-						{SUPPORTED_LANGUAGES.map((language) => {
-							const isSelected = getCurrentLanguage() === language.code;
+						{SUPPORTED_LANGUAGES.map((lang) => {
+							const isSelected = language === lang.code;
 							return (
 								<TouchableOpacity
-									key={language.code}
-									onPress={() => handleLanguageChange(language.code)}
+									key={lang.code}
+									onPress={() => handleLanguageChange(lang.code)}
 									className={`flex-row items-center px-6 py-3 ${
 										isSelected ? "bg-blue-50 dark:bg-blue-900/20" : ""
 									}`}
 								>
-									<Text className="text-2xl mr-3">{language.flag}</Text>
+									<Text className="text-2xl mr-3">{lang.flag}</Text>
 									<Text
 										className={`text-base ${
 											isSelected
@@ -377,7 +370,7 @@ export default function HomePage() {
 												: "text-gray-700 dark:text-gray-200"
 										}`}
 									>
-										{language.name}
+										{lang.name}
 									</Text>
 									{isSelected && (
 										<Feather

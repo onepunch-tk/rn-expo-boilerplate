@@ -64,11 +64,6 @@ export const changeLanguage = (lang: string) => {
 	});
 };
 
-// Get current language
-export const getCurrentLanguage = () => {
-	return i18next.language;
-};
-
 // Check if current language is RTL
 export const isRTLLanguage = () => {
 	return i18next.language === "ar";

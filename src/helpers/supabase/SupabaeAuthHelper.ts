@@ -125,6 +125,7 @@ export const SupabaseAuthHelper = {
 					}
 
 					const { access_token, refresh_token } = params;
+					console.log("access_token", access_token);
 					const { data, error } = await supabase.auth.setSession({
 						access_token,
 						refresh_token,

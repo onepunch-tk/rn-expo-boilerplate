@@ -349,101 +349,6 @@ npm run android:cc:stats # Android 캐시 통계만 확인
 
 더 자세한 정보는 [ccache 공식 문서](https://ccache.dev/), [React Native 공식 문서](https://reactnative.dev/docs/build-speed)를 참고하세요.
 
-## 📁 프로젝트 구조
-
-```
-├── src/                          # 소스 코드 루트
-│   ├── app/                      # Expo Router 기반 앱 구조
-│   │   ├── _layout.tsx           # 루트 레이아웃 (GestureHandlerRootView 설정)
-│   │   ├── index.tsx             # 메인 엔트리 포인트
-│   │   ├── +not-found.tsx        # 404 페이지
-│   │   ├── (app)/                # 메인 앱 화면들
-│   │   │   ├── _layout.tsx       # 앱 레이아웃
-│   │   │   └── index.tsx         # 홈 화면 (언어 변경 UI 포함)
-│   │   └── (auth)/               # 인증 관련 화면들
-│   │       ├── _layout.tsx       # 인증 레이아웃
-│   │       └── index.tsx         # 로그인/회원가입 화면
-│   ├── components/               # 재사용 가능한 컴포넌트
-│   │   ├── LoadingScreen.tsx     # 로딩 화면 컴포넌트
-│   │   └── OnboardingScreen.tsx  # 온보딩 화면 컴포넌트
-│   ├── constants/                # 상수 정의
-│   │   ├── auth.ts               # 인증 관련 상수
-│   │   └── onboarding.ts         # 온보딩 관련 상수
-│   ├── context/                  # 리액트 컨텍스트
-│   │   ├── AppContext.tsx        # 앱 전역 상태 관리
-│   │   └── AuthContext.tsx       # 인증 상태 관리
-│   ├── helpers/                  # 유틸리티 함수들
-│   │   ├── crashlytics.ts        # Firebase Crashlytics 헬퍼
-│   │   ├── storage.ts            # MMKV 스토리지 헬퍼
-│   │   ├── i18n/                 # 국제화(i18n) 모듈
-│   │   │   ├── config.ts         # i18next 설정 및 초기화
-│   │   │   ├── @types/           # 타입 안전성 지원
-│   │   │   │   └── i18next.d.ts  # i18next 타입 확장
-│   │   │   └── locales/          # 언어별 번역 파일
-│   │   │       ├── ko.json       # 한국어 번역
-│   │   │       ├── en.json       # 영어 번역
-│   │   │       └── ar.json       # 아랍어 번역
-│   │   └── supabase/             # Supabase 관련 모듈들
-│   │       ├── client.ts         # Supabase 클라이언트 생성 및 설정
-│   │       ├── env.ts            # 환경 변수 스키마 및 검증
-│   │       ├── SupabaseAuthHelper.ts # 인증 헬퍼 함수들
-│   │       ├── types.ts          # 공통 타입 정의
-│   │       └── utils.ts          # 유틸리티 함수들
-│   ├── hooks/                    # 커스텀 React 훅
-│   │   └── useOnboarding.ts      # 온보딩 상태 관리 훅
-│   └── types/                    # 타입 정의
-│       ├── app.ts                # 앱 관련 타입 정의
-│       └── auth.ts               # 인증 관련 타입 정의
-├── modules/                      # 네이티브 모듈 (Expo Modules API)
-│   ├── kakao-core/               # 카카오 SDK 코어 모듈
-│   │   ├── android/              # Android 네이티브 구현
-│   │   │   ├── build.gradle      # Gradle 빌드 설정
-│   │   │   └── src/main/java/    # Kotlin 소스 코드
-│   │   ├── ios/                  # iOS 네이티브 구현
-│   │   │   ├── KakaoCore.podspec # CocoaPods 설정
-│   │   │   └── *.swift           # Swift 소스 코드
-│   │   ├── src/                  # TypeScript 인터페이스
-│   │   ├── expo-module.config.json
-│   │   └── index.ts
-│   ├── kakao-user/               # 카카오 사용자 인증 모듈
-│   │   ├── android/              # Android 네이티브 구현
-│   │   ├── ios/                  # iOS 네이티브 구현
-│   │   ├── src/                  # TypeScript 인터페이스
-│   │   ├── expo-module.config.json
-│   │   └── index.ts
-│   └── kakaosdk-version.json     # 카카오 SDK 버전 관리
-├── plugins/                      # Expo Config Plugins
-│   ├── kakao/                    # 카카오 설정 플러그인
-│   │   ├── build/                # 빌드된 JavaScript 파일
-│   │   ├── src/                  # TypeScript 소스 코드
-│   │   ├── index.js              # 플러그인 진입점
-│   │   └── tsconfig.json
-│   ├── some/                     # 기타 플러그인 예시
-│   └── tsconfig.json             # 플러그인 전체 TypeScript 설정
-├── assets/                       # 정적 자산
-│   ├── fonts/                    # 폰트 파일들
-│   │   └── SpaceMono-Regular.ttf
-│   └── images/                   # 이미지 파일들
-│       ├── onboarding/           # 온보딩 이미지들
-│       ├── icon.png              # 앱 아이콘
-│       ├── splash-icon.png       # 스플래시 아이콘
-│       └── ...                   # 기타 이미지들
-├── scripts/                      # 빌드 스크립트
-│   └── build-with-ccache.sh      # ccache 빌드 스크립트
-├── android/                      # Android 프로젝트 (expo prebuild로 생성)
-├── ios/                          # iOS 프로젝트 (expo prebuild로 생성)
-├── google-services.json          # Firebase Android 설정
-├── GoogleService-Info.plist      # Firebase iOS 설정
-├── app.json                      # Expo 앱 설정
-├── package.json                  # npm 패키지 설정
-├── tsconfig.json                 # TypeScript 설정
-├── tailwind.config.js            # TailwindCSS 설정
-├── metro.config.js               # Metro 번들러 설정
-├── babel.config.js               # Babel 설정
-├── firebase.json                 # Firebase 설정
-└── global.css                    # 전역 CSS (NativeWind)
-```
-
 ## 🔧 구성 요소 상세
 
 ### 📱 온보딩 시스템
@@ -807,6 +712,7 @@ try {
 - **기능**: 
   - 앱 전역 상태 관리
   - 컬러 스킴 설정 (다크/라이트 모드)
+  - 언어 설정 및 관리 (국제화 연동)
   - 로컬 스토리지 연동
   - 에러 핸들링
 - **설정**: `src/app/_layout.tsx`에서 `AppProvider`로 앱 전체를 감싸야 함
@@ -816,14 +722,19 @@ try {
 import { useAppContext } from "@/context/AppContext";
 
 function MyComponent() {
-  const { colorScheme, setColorScheme } = useAppContext();
+  const { colorScheme, setColorScheme, language, setLanguage } = useAppContext();
   
   return (
     <View>
       <Text>현재 테마: {colorScheme}</Text>
+      <Text>현재 언어: {language}</Text>
       <Button 
         title="다크 모드로 변경" 
         onPress={() => setColorScheme("dark")} 
+      />
+      <Button 
+        title="영어로 변경" 
+        onPress={() => setLanguage("en")} 
       />
     </View>
   );
@@ -838,8 +749,11 @@ AppContext에 새로운 전역 상태를 추가할 수 있습니다:
 export interface AppContextType {
   colorScheme: ColorSchemeType;
   setColorScheme: (value: ColorSchemeType) => void;
+  language: string;
+  setLanguage: (value: string) => void;
   // 새로운 필드 추가
-  foo:"bar"
+  foo: string;
+  setFoo: (value: string) => void;
 }
 ```
 
@@ -847,6 +761,9 @@ export interface AppContextType {
 ```typescript
 export function AppProvider({ children }: PropsWithChildren) {
   const [userColorScheme, setUserColorScheme] = useState<ColorSchemeType>("dark");
+  const [language, setAppLanguage] = useState<string>(
+    getLocales()[0].languageCode || "ko"
+  );
   const [foo, setFoo] = useState<string>("bar");
   
   // ... existing code ...
@@ -855,6 +772,13 @@ export function AppProvider({ children }: PropsWithChildren) {
     <AppContext value={{ 
       colorScheme: userColorScheme, 
       setColorScheme,
+      language,
+      setLanguage: async (newLanguage: string) => {
+        // 자동으로 스토리지 저장 및 i18n 연동
+        await StorageHelper.setItem(LANGUAGE_KEY, newLanguage);
+        setAppLanguage(newLanguage);
+        changeLanguage(newLanguage);
+      },
       foo,
       setFoo
     }}>
@@ -1009,20 +933,35 @@ function MyComponent() {
 
 **언어 변경:**
 ```typescript
-import { changeLanguage } from "@/helpers/i18n/config";
+import { useAppContext } from "@/context/AppContext";
 
-// 언어 변경
-changeLanguage("en"); // 영어로 변경
-changeLanguage("ar"); // 아랍어로 변경
-changeLanguage("ko"); // 한국어로 변경
+function MyComponent() {
+  const { language, setLanguage } = useAppContext();
+  
+  // 언어 변경 (자동으로 스토리지 저장 및 i18n 연동)
+  setLanguage("en"); // 영어로 변경
+  setLanguage("ar"); // 아랍어로 변경
+  setLanguage("ko"); // 한국어로 변경
+  
+  return (
+    <View>
+      <Text>현재 언어: {language}</Text>
+    </View>
+  );
+}
 ```
 
-**현재 언어 확인:**
+**지원 언어 목록 확인:**
 ```typescript
-import { getCurrentLanguage } from "@/helpers/i18n/config";
+import { SUPPORTED_LANGUAGES } from "@/constants/app";
 
-const currentLang = getCurrentLanguage();
-console.log("현재 언어:", currentLang); // "ko", "en", "ar"
+// 지원하는 언어 목록
+console.log(SUPPORTED_LANGUAGES);
+// [
+//   { code: "ko", name: "한국어", flag: "🇰🇷" },
+//   { code: "en", name: "English", flag: "🇺🇸" },
+//   { code: "ar", name: "العربية", flag: "🇸🇦" }
+// ]
 ```
 
 #### 타입 안전성
@@ -1042,15 +981,27 @@ t("nonexistent.key") // TypeScript 에러!
 #### 설정 파일 구조
 
 ```
-src/helpers/i18n/
-├── config.ts              # i18next 설정 및 초기화
-├── @types/
-│   └── i18next.d.ts       # 타입 안전성 설정
-└── locales/
-    ├── ko.json            # 한국어 번역
-    ├── en.json            # 영어 번역
-    └── ar.json            # 아랍어 번역
+src/
+├── constants/
+│   └── app.ts              # 지원 언어 목록 (SUPPORTED_LANGUAGES)
+├── context/
+│   └── AppContext.tsx      # 언어 상태 관리 Provider
+├── helpers/i18n/
+│   ├── config.ts           # i18next 설정 및 초기화
+│   ├── @types/
+│   │   └── i18next.d.ts    # 타입 안전성 설정
+│   └── locales/
+│       ├── ko.json         # 한국어 번역
+│       ├── en.json         # 영어 번역
+│       └── ar.json         # 아랍어 번역
+└── types/
+    └── app.ts              # AppContext 타입 정의
 ```
+
+**주요 변경 사항:**
+- **`SUPPORTED_LANGUAGES`**: `src/constants/app.ts`에서 지원 언어 목록 관리
+- **언어 설정**: `AppContext`를 통해 통합 관리 (기존 `getCurrentLanguage` 함수 제거)
+- **자동화**: 언어 변경 시 스토리지 저장 및 i18n 연동 자동 처리
 
 #### 새로운 언어 추가하기
 
@@ -1064,7 +1015,17 @@ src/helpers/i18n/
    }
    ```
 
-2. **config.ts 수정**: 새 언어를 resources에 추가
+2. **지원 언어 목록에 추가**: `src/constants/app.ts` 파일 수정
+   ```typescript
+   export const SUPPORTED_LANGUAGES = [
+     { code: "ko", name: "한국어", flag: "🇰🇷" },
+     { code: "en", name: "English", flag: "🇺🇸" },
+     { code: "ar", name: "العربية", flag: "🇸🇦" },
+     { code: "fr", name: "Français", flag: "🇫🇷" }, // 새 언어 추가
+   ];
+   ```
+
+3. **config.ts 수정**: 새 언어를 resources에 추가
    ```typescript
    import translationsFr from "./locales/fr.json";
    
@@ -1076,7 +1037,7 @@ src/helpers/i18n/
    } as const;
    ```
 
-3. **app.json 업데이트**: locales 속성에 새 언어 추가
+4. **app.json 업데이트**: locales 속성에 새 언어 추가
    ```json
    {
      "expo": {
@@ -1089,6 +1050,44 @@ src/helpers/i18n/
      }
    }
    ```
+
+#### AppContext를 통한 언어 관리
+
+앱에서 언어 변경은 `AppContext`를 통해 통합 관리됩니다:
+
+**기본 사용법:**
+```typescript
+import { useAppContext } from "@/context/AppContext";
+import { SUPPORTED_LANGUAGES } from "@/constants/app";
+
+function LanguageSelector() {
+  const { language, setLanguage } = useAppContext();
+  
+  return (
+    <View>
+      <Text>현재 언어: {language}</Text>
+      
+      {SUPPORTED_LANGUAGES.map((lang) => (
+        <TouchableOpacity
+          key={lang.code}
+          onPress={() => setLanguage(lang.code)}
+          style={{
+            backgroundColor: language === lang.code ? '#blue' : '#gray'
+          }}
+        >
+          <Text>{lang.flag} {lang.name}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+}
+```
+
+**자동 처리 기능:**
+- **로컬 스토리지 저장**: 선택한 언어가 자동으로 MMKV에 저장됨
+- **i18n 연동**: `changeLanguage()` 함수가 자동으로 호출됨
+- **앱 재시작 시 복원**: 저장된 언어로 자동 초기화
+- **RTL 지원**: 아랍어 등 RTL 언어 자동 처리
 
 #### 중요한 설정 사항
 
@@ -1322,6 +1321,7 @@ npm run build:plugin
 
 - 📱 **푸시 알림**: Firebase Cloud Messaging
 - 💰 **인앱 결제**: RevenueCat 연동
+- 💰 **Toss Payment 결제**: Toass Payment SDK 연동
 - 🎯 **분석**: Firebase Analytics
 - 📋 **폼 관리**: React Hook Form
 

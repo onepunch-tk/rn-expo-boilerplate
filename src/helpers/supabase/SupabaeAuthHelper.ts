@@ -1,10 +1,5 @@
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import {
-	type AuthChangeEvent,
-	AuthError,
-	type Session,
-	type User,
-} from "@supabase/supabase-js";
+import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
 import * as WebBrowser from "expo-web-browser";
@@ -12,6 +7,10 @@ import { AUTH_PROVIDERS } from "@/constants/auth";
 import KakaoCoreModule from "~/modules/kakao-core/";
 import KakaoUserModule from "~/modules/kakao-user";
 import { supabase } from "./client";
+import {
+	convertToFormattedAuthError,
+	createFormattedAuthError,
+} from "./errorHandler";
 import type { Result, SignOutResponse } from "./types";
 import { createAuthResult } from "./utils";
 
@@ -33,7 +32,7 @@ export const SupabaseAuthHelper = {
 	configureGoogleSignIn() {
 		const googleWebClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 		if (!googleWebClientId) {
-			throw new Error("Google Web Client ID가 설정되지 않았습니다.");
+			throw createFormattedAuthError("GOOGLE", "GOOGLE_WEB_CLIENT_ID_NOT_SET");
 		}
 
 		GoogleSignin.configure({
@@ -43,7 +42,7 @@ export const SupabaseAuthHelper = {
 	initializeKakaoSDK() {
 		const kakaoNativeAppKey = process.env.EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY;
 		if (!kakaoNativeAppKey) {
-			throw new Error("Kakao Native App Key가 설정되지 않았습니다.");
+			throw createFormattedAuthError("KAKAO", "KAKAO_NATIVE_APP_KEY_NOT_SET");
 		}
 
 		KakaoCoreModule.initializeKakaoSDK(kakaoNativeAppKey);
@@ -56,7 +55,7 @@ export const SupabaseAuthHelper = {
 			if (!userInfo.data?.idToken) {
 				return createAuthResult(
 					null,
-					new AuthError("ID 토큰을 찾을 수 없습니다"),
+					createFormattedAuthError("GOOGLE", "GOOGLE_ID_TOKEN_NOT_FOUND"),
 				);
 			}
 
@@ -67,15 +66,7 @@ export const SupabaseAuthHelper = {
 
 			return createAuthResult(data, error);
 		} catch (error) {
-			const authError =
-				error instanceof AuthError
-					? error
-					: new AuthError(
-							error instanceof Error
-								? error.message
-								: "Google 로그인 중 오류가 발생했습니다",
-						);
-
+			const authError = convertToFormattedAuthError("GOOGLE", error);
 			return createAuthResult(null, authError);
 		}
 	},
@@ -86,14 +77,14 @@ export const SupabaseAuthHelper = {
 			if (!kakaoResult.success || kakaoResult.error) {
 				return createAuthResult(
 					null,
-					new AuthError(kakaoResult.error || "카카오 로그인에 실패했습니다"),
+					createFormattedAuthError("KAKAO", "KAKAO_LOGIN_FAILED"),
 				);
 			}
 
 			if (!kakaoResult.token?.idToken) {
 				return createAuthResult(
 					null,
-					new AuthError("카카오 ID 토큰을 찾을 수 없습니다"),
+					createFormattedAuthError("KAKAO", "KAKAO_ID_TOKEN_NOT_FOUND"),
 				);
 			}
 
@@ -104,15 +95,7 @@ export const SupabaseAuthHelper = {
 
 			return createAuthResult(data, error);
 		} catch (error) {
-			const authError =
-				error instanceof AuthError
-					? error
-					: new AuthError(
-							error instanceof Error
-								? error.message
-								: "카카오 로그인 중 오류가 발생했습니다",
-						);
-
+			const authError = convertToFormattedAuthError("KAKAO", error);
 			return createAuthResult(null, authError);
 		}
 	},
@@ -135,7 +118,10 @@ export const SupabaseAuthHelper = {
 					const { url } = res;
 					const { params, errorCode } = QueryParams.getQueryParams(url);
 					if (errorCode) {
-						return createAuthResult(null, new AuthError(errorCode));
+						return createAuthResult(
+							null,
+							convertToFormattedAuthError("FACEBOOK", errorCode),
+						);
 					}
 
 					const { access_token, refresh_token } = params;
@@ -152,12 +138,15 @@ export const SupabaseAuthHelper = {
 				} else {
 					return createAuthResult(
 						null,
-						new AuthError("Facebook 로그인에 실패했습니다"),
+						createFormattedAuthError("FACEBOOK", "FACEBOOK_LOGIN_FAILED"),
 					);
 				}
 			}
 		} catch (error) {
-			return createAuthResult(null, new AuthError(error as string));
+			return createAuthResult(
+				null,
+				convertToFormattedAuthError("FACEBOOK", error),
+			);
 		}
 	},
 	async signOut(): Promise<SignOutResponse> {

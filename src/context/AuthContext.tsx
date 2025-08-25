@@ -6,6 +6,7 @@ import {
 	useEffect,
 	useState,
 } from "react";
+import { AnalyticsHelper } from "@/helpers/analytics";
 import { CrashlyticsHelper } from "@/helpers/crashlytics";
 import { SupabaseAuthHelper } from "@/helpers/supabase/SupabaeAuthHelper";
 import type { AuthContextType } from "@/types/auth";
@@ -18,14 +19,27 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
 	useEffect(() => {
 		async function handleAuthSession(session: Session | null) {
-			setAuthUser(session?.user ?? null);
+			try {
+				setAuthUser(session?.user ?? null);
+				await CrashlyticsHelper.setUserId(session?.user?.id ?? null);
 
-			await CrashlyticsHelper.setUserId(session?.user?.id ?? null);
-			await CrashlyticsHelper.setAttributes({
-				email: session?.user?.email ?? "anonymous",
-				provider: session?.user?.user_metadata?.provider_id ?? "anonymous",
-			});
+				const user = {
+					email: session?.user?.email ?? "anonymous",
+					provider:
+						(session?.user?.user_metadata?.provider_id as string) ??
+						"anonymous",
+				};
+
+				await CrashlyticsHelper.setAttributes(user);
+				await AnalyticsHelper.setUserProperty(user);
+			} catch (error) {
+				if (__DEV__) {
+					console.error("Error setting crashlytics attributes: ", error);
+				}
+				await CrashlyticsHelper.recordError(error as Error);
+			}
 		}
+
 		SupabaseAuthHelper.getSession().then(async ({ data: { session } }) => {
 			await handleAuthSession(session);
 			setIsAuthLoading(false);

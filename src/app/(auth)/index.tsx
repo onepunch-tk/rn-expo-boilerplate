@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { useTranslation } from "react-i18next";
 import { Platform, Text, TouchableOpacity, View } from "react-native";

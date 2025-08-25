@@ -6,10 +6,10 @@ import { Image } from "expo-image";
 import { router, Stack } from "expo-router";
 import { useState } from "react";
 import {
-	Button,
 	Dimensions,
 	type ImageSourcePropType, // require() 이미지 타입
 	Text,
+	TouchableOpacity,
 	View,
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -87,9 +87,10 @@ function ContentPage({
 	const imageSize = SCREEN_WIDTH * 0.9;
 
 	/**
-	 * 페이지 애니메이션 스타일 계산
-	 * - UI 스레드에서 실행되는 worklet 함수
-	 * - 실시간으로 스와이프에 따른 위치, 크기, 투명도 계산
+	 * 단순한 슬라이딩 애니메이션 스타일
+	 * - translateX만 사용한 순수 슬라이딩 효과
+	 * - 복잡한 보간이나 스케일/투명도 효과 제거
+	 * - 컨텐츠 사라짐 방지를 위해 opacity 제거
 	 */
 	const pageStyle = useAnimatedStyle(() => {
 		"worklet";
@@ -99,44 +100,23 @@ function ContentPage({
 		// 실제 표시 위치: 기본 위치 + 스와이프 이동량
 		const translateXValue = offset + translateX.value;
 
-		// 현재 페이지와의 거리 계산 (성능 최적화용)
-		const distance = Math.abs(page - currentPage);
-
-		// 성능 최적화: 인접하지 않은 페이지(거리 > 1)는 완전히 숨김
-		// 메모리와 렌더링 성능 향상
-		if (distance > 1) {
-			return {
-				opacity: 0,
-				transform: [{ translateX: translateXValue }],
-			};
-		}
-
-		// 스케일 애니메이션: 스와이프 시 페이지가 살짝 축소되는 효과
-		// 0에서 SCREEN_WIDTH까지의 스와이프 거리를 1.0에서 0.85 스케일로 매핑
-		const scale = interpolate(
-			Math.abs(translateX.value), // 스와이프 거리 (절댓값)
-			[0, SCREEN_WIDTH], // 입력 범위: 0 ~ 화면 너비
-			[1, 0.85], // 출력 범위: 100% ~ 85% 크기
-			"clamp", // 범위 제한: 입력값이 범위를 벗어나도 안전
-		);
-
-		// 투명도 애니메이션: 3단계 페이드 효과
-		// 페이지가 멀어질수록 점진적으로 투명해짐
-		const opacity = interpolate(
-			Math.abs(translateXValue), // 페이지의 절대 위치
-			[0, SCREEN_WIDTH * 0.5, SCREEN_WIDTH], // 입력: 0, 화면 절반, 화면 전체
-			[1, 0.8, 0.3], // 출력: 100% → 80% → 30% 투명도
-			"clamp",
-		);
-
+		// 모든 페이지에 대해 단순한 translateX만 적용
+		// opacity 제거로 컨텐츠 사라짐 방지
 		return {
-			opacity,
-			transform: [{ translateX: translateXValue }, { scale }],
+			transform: [{ translateX: translateXValue }],
 		};
 	});
 
 	return (
-		<Animated.View style={[pageStyle]} className="flex-1 absolute h-full">
+		<Animated.View
+			style={[
+				pageStyle,
+				{
+					width: SCREEN_WIDTH, // 명시적 너비 설정
+				},
+			]}
+			className="flex-1 absolute h-full left-0 top-0"
+		>
 			{/* 이미지 영역: 전체 화면의 60% (flex-[6]) */}
 			<View className="flex-[6] justify-end items-center pb-4">
 				<Image
@@ -152,13 +132,16 @@ function ContentPage({
 			{/* 텍스트 영역: 전체 화면의 40% (flex-[4]) */}
 			<View className="flex-[4] justify-start items-center px-8 pt-4">
 				{/* 제목: 최대 2줄, 3xl 크기, 굵은 글꼴 */}
-				<Text className="text-3xl font-bold text-center mb-3" numberOfLines={2}>
+				<Text
+					className="text-3xl font-bold text-center mb-3 w-full"
+					numberOfLines={2}
+				>
 					{title}
 				</Text>
 
 				{/* 부제목: 최대 2줄, 기본 크기, 말줄임표 처리 */}
 				<Text
-					className="text-base text-center leading-5"
+					className="text-base text-center leading-5 w-full"
 					numberOfLines={2}
 					ellipsizeMode="tail" // 텍스트가 길면 끝부분에 "..." 표시
 				>
@@ -181,74 +164,29 @@ function ContentPage({
  */
 function PaginationDot({ page, currentPage, translateX }: PageIndicator) {
 	/**
-	 * 점(dot)의 동적 스타일 계산
-	 * - 스와이프 진행률에 따라 실시간으로 크기와 투명도 변경
-	 * - 다음 페이지로 이동 시 미리보기 효과 제공
+	 * 단순한 페이지 인디케이터 스타일
+	 * - 현재 페이지만 강조하는 단순한 표시
+	 * - 복잡한 진행률 애니메이션 제거
 	 */
 	const dotStyle = useAnimatedStyle(() => {
 		"worklet";
 
-		const isActive = page === currentPage; // 현재 활성 페이지 여부
-		const progress = translateX.value / SCREEN_WIDTH; // 스와이프 진행률 (-1 ~ 1)
+		const isActive = page === currentPage;
+		const progress = Math.abs(translateX.value / SCREEN_WIDTH);
 
-		// 현재 페이지로부터의 거리 (0: 현재, 1: 인접, 2+: 멀리)
-		const distanceFromCurrent = Math.abs(page - currentPage);
-
-		let animatedWidth: number; // 동적 너비
-		let animatedOpacity: number; // 동적 투명도
-
+		// 단순한 활성/비활성 표시
 		if (isActive) {
-			// === 현재 활성 페이지 ===
-			// 스와이프할수록 작아짐 (24px → 8px)
-			animatedWidth = interpolate(Math.abs(progress), [0, 1], [24, 8], "clamp");
-			// 스와이프할수록 투명해짐 (100% → 40%)
-			animatedOpacity = interpolate(
-				Math.abs(progress),
-				[0, 1],
-				[1, 0.4],
-				"clamp",
-			);
-		} else if (distanceFromCurrent === 1) {
-			// === 인접한 페이지 (바로 옆 페이지) ===
-
-			// 스와이프 방향에 따른 다음 대상 페이지 판별
-			// progress < 0: 오른쪽으로 스와이프 (다음 페이지로)
-			// progress > 0: 왼쪽으로 스와이프 (이전 페이지로)
-			const isTargetPage =
-				(progress < 0 && page === currentPage + 1) || // 다음 페이지가 대상
-				(progress > 0 && page === currentPage - 1); // 이전 페이지가 대상
-
-			if (isTargetPage) {
-				// 다음에 활성화될 페이지: 점진적으로 커짐 (8px → 24px)
-				animatedWidth = interpolate(
-					Math.abs(progress),
-					[0, 1],
-					[8, 24],
-					"clamp",
-				);
-				// 점진적으로 불투명해짐 (40% → 100%)
-				animatedOpacity = interpolate(
-					Math.abs(progress),
-					[0, 1],
-					[0.4, 1],
-					"clamp",
-				);
-			} else {
-				// 반대 방향의 인접 페이지: 기본 상태 유지
-				animatedWidth = 8;
-				animatedOpacity = 0.4;
-			}
+			// 현재 페이지: 큰 점
+			const width = interpolate(progress, [0, 0.5], [24, 16], "clamp");
+			const opacity = interpolate(progress, [0, 0.5], [1, 0.7], "clamp");
+			return { width, opacity };
 		} else {
-			// === 멀리 떨어진 페이지 ===
-			// 가장 작고 투명한 상태 유지
-			animatedWidth = 8;
-			animatedOpacity = 0.2;
+			// 다른 페이지: 작은 점
+			return {
+				width: 8,
+				opacity: 0.3,
+			};
 		}
-
-		return {
-			width: animatedWidth,
-			opacity: animatedOpacity,
-		};
 	});
 
 	return (
@@ -354,11 +292,11 @@ export function OnboardingScreen() {
 				(isQuickSwipe && velocity > 300); // 또는 빠른 왼쪽 스와이프 (300px/s 이상)
 
 			// === 애니메이션 실행 ===
-			// 스프링 애니메이션 설정: 자연스럽고 부드러운 움직임
+			// 단순한 스프링 애니메이션: 빠르고 직관적인 움직임
 			const springConfig = {
-				damping: 25, // 감쇠율: 높을수록 오버슈트 감소
-				stiffness: 200, // 강성: 낮을수록 느린 애니메이션
-				mass: 1, // 질량: 물리적 무게감 추가
+				damping: 15, // 낮은 감쇠: 더 빠른 정착
+				stiffness: 300, // 높은 강성: 더 빠른 반응
+				mass: 0.8, // 낮은 질량: 가벼운 느낌
 			};
 
 			if (shouldMoveNext && currentPage < ONBOARDING_PAGES.length - 1) {
@@ -442,13 +380,15 @@ export function OnboardingScreen() {
 								className="absolute px-8"
 								entering={FadeInUp.delay(150).springify()} // 300ms 지연 후 하단에서 부드럽게 등장
 							>
-								<View className="bg-blue-600 rounded-3xl overflow-hidden shadow-lg py-1">
-									<Button
-										title={"Get Started"}
-										color="white"
-										onPress={handleDone}
-									/>
-								</View>
+								<TouchableOpacity
+									className="bg-blue-600 rounded-3xl shadow-lg py-4 px-8"
+									onPress={handleDone}
+									activeOpacity={0.8}
+								>
+									<Text className="text-white text-center text-lg font-semibold">
+										Get Started
+									</Text>
+								</TouchableOpacity>
 							</Animated.View>
 						)}
 					</Animated.View>

@@ -15,8 +15,7 @@
 			"appleTeamId": "63KCC5ADLW",
 			"infoPlist": {
 				"CFBundleAllowMixedLocalizations": true
-			},
-			"usesAppleSignIn": true
+			}
 		},
 		"android": {
 			"googleServicesFile": "./google-services.json",
@@ -70,8 +69,7 @@
 					}
 				}
 			],
-			"expo-localization",
-			"expo-apple-authentication"
+			"expo-localization"
 		],
 		"experiments": {
 			"typedRoutes": true
